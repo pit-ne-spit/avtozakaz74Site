@@ -63,7 +63,7 @@ export default function SearchableSelect({
           }
         }}
         disabled={disabled || loading}
-        className={`select w-full flex items-center justify-between gap-2 ${
+        className={`select w-full flex items-center justify-between gap-2 h-[42px] ${
           disabled || loading ? 'opacity-60 cursor-not-allowed' : ''
         }`}
       >

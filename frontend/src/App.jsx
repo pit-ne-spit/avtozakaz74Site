@@ -26,11 +26,47 @@ const defaultFilters = {
 // Static options for dropdowns
 const staticOptions = {
   fuelTypes: ['Gasoline', 'Diesel', 'Electric', 'Hybrid'],
-  years: Array.from({ length: 40 }, (_, i) => 2025 - i),
-  mileages: [0, 10000, 30000, 50000, 80000, 100000, 150000, 200000, 250000, 300000],
-  prices: [1000000, 2000000, 3000000, 4000000, 5000000, 7000000, 10000000],
-  engineVolumes: [1000, 1500, 2000, 2500, 3000, 3500, 4000, 5000],
-  powers: [50, 75, 100, 150, 200, 250, 300, 400],
+  
+  // Year options: 2005-2026
+  yearsFrom: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
+  yearsTo: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
+  
+  // Price options in rubles
+  pricesFrom: [1000000, 1500000, 2000000, 2500000, 3000000],
+  pricesTo: [1500000, 2000000, 2500000, 3000000, 4000000],
+  
+  // Engine volume options in liters
+  // 0.5-2.0 with 0.1 step, then 2.5-4.0 with 0.5 step
+  engineVolumesFrom: [
+    ...Array.from({ length: 16 }, (_, i) => +(0.5 + i * 0.1).toFixed(1)), // 0.5-2.0
+    2.5, 3.0, 3.5, 4.0
+  ],
+  engineVolumesTo: [
+    ...Array.from({ length: 16 }, (_, i) => +(0.5 + i * 0.1).toFixed(1)), // 0.5-2.0
+    2.5, 3.0, 3.5, 4.0
+  ],
+  
+  // Mileage options in km
+  // 0-100k with 10k step, 100k-200k with 20k step
+  mileagesFrom: [
+    ...Array.from({ length: 11 }, (_, i) => i * 10000), // 0-100k
+    120000, 140000, 160000, 180000, 200000
+  ],
+  mileagesTo: [
+    ...Array.from({ length: 11 }, (_, i) => i * 10000), // 0-100k
+    120000, 140000, 160000, 180000, 200000
+  ],
+  
+  // Power options in HP
+  // 70-160 with 10 step, then 190-310 with 30 step
+  powersFrom: [
+    ...Array.from({ length: 10 }, (_, i) => 70 + i * 10), // 70-160
+    190, 220, 250, 280, 310
+  ],
+  powersTo: [
+    ...Array.from({ length: 10 }, (_, i) => 70 + i * 10), // 70-160
+    190, 220, 250, 280, 310
+  ],
 };
 
 export default function App() {

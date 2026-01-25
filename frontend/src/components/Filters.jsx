@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import SearchableSelect from './SearchableSelect';
+import NumericInputWithOptions from './NumericInputWithOptions';
 
 /**
  * Filters component - displays all search filters
@@ -64,23 +65,23 @@ export default function Filters({ value, onChange, onSearch, options, loading })
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Год</label>
           <div className="flex gap-2">
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.year_from || ''} 
-              onChange={e => update('year_from', e.target.value)}
+            <NumericInputWithOptions
+              value={local.year_from}
+              onChange={val => update('year_from', val)}
+              options={options.yearsFrom || []}
               placeholder="От"
-              min="1980"
-              max="2025"
+              min={1980}
+              max={2026}
+              step={1}
             />
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.year_to || ''} 
-              onChange={e => update('year_to', e.target.value)}
+            <NumericInputWithOptions
+              value={local.year_to}
+              onChange={val => update('year_to', val)}
+              options={options.yearsTo || []}
               placeholder="До"
-              min="1980"
-              max="2025"
+              min={1980}
+              max={2026}
+              step={1}
             />
           </div>
         </div>
@@ -89,23 +90,25 @@ export default function Filters({ value, onChange, onSearch, options, loading })
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Цена (₽)</label>
           <div className="flex gap-2">
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.total_price_rub_min || ''} 
-              onChange={e => update('total_price_rub_min', e.target.value)}
+            <NumericInputWithOptions
+              value={local.total_price_rub_min}
+              onChange={val => update('total_price_rub_min', val)}
+              options={options.pricesFrom || []}
               placeholder="От"
-              min="0"
-              step="100000"
+              min={0}
+              max={50000000}
+              step={100000}
+              formatOption={v => `${(v / 1000000).toFixed(1)} млн`}
             />
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.total_price_rub_max || ''} 
-              onChange={e => update('total_price_rub_max', e.target.value)}
+            <NumericInputWithOptions
+              value={local.total_price_rub_max}
+              onChange={val => update('total_price_rub_max', val)}
+              options={options.pricesTo || []}
               placeholder="До"
-              min="0"
-              step="100000"
+              min={0}
+              max={50000000}
+              step={100000}
+              formatOption={v => `${(v / 1000000).toFixed(1)} млн`}
             />
           </div>
         </div>
@@ -114,23 +117,23 @@ export default function Filters({ value, onChange, onSearch, options, loading })
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Пробег (км)</label>
           <div className="flex gap-2">
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.mileage_from || ''} 
-              onChange={e => update('mileage_from', e.target.value)}
+            <NumericInputWithOptions
+              value={local.mileage_from}
+              onChange={val => update('mileage_from', val)}
+              options={options.mileagesFrom || []}
               placeholder="От"
-              min="0"
-              step="10000"
+              min={0}
+              max={500000}
+              step={10000}
             />
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.mileage_to || ''} 
-              onChange={e => update('mileage_to', e.target.value)}
+            <NumericInputWithOptions
+              value={local.mileage_to}
+              onChange={val => update('mileage_to', val)}
+              options={options.mileagesTo || []}
               placeholder="До"
-              min="0"
-              step="10000"
+              min={0}
+              max={500000}
+              step={10000}
             />
           </div>
         </div>
@@ -154,25 +157,25 @@ export default function Filters({ value, onChange, onSearch, options, loading })
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Объем двигателя (л)</label>
           <div className="flex gap-2">
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.engine_volume_from || ''} 
-              onChange={e => update('engine_volume_from', e.target.value)}
+            <NumericInputWithOptions
+              value={local.engine_volume_from}
+              onChange={val => update('engine_volume_from', val)}
+              options={options.engineVolumesFrom || []}
               placeholder="От"
-              min="0"
-              max="10"
-              step="0.1"
+              min={0.1}
+              max={10}
+              step={0.1}
+              formatOption={v => `${v}L`}
             />
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.engine_volume_to || ''} 
-              onChange={e => update('engine_volume_to', e.target.value)}
+            <NumericInputWithOptions
+              value={local.engine_volume_to}
+              onChange={val => update('engine_volume_to', val)}
+              options={options.engineVolumesTo || []}
               placeholder="До"
-              min="0"
-              max="10"
-              step="0.1"
+              min={0.1}
+              max={10}
+              step={0.1}
+              formatOption={v => `${v}L`}
             />
           </div>
         </div>
@@ -181,23 +184,25 @@ export default function Filters({ value, onChange, onSearch, options, loading })
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Мощность (л.с.)</label>
           <div className="flex gap-2">
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.power_from || ''} 
-              onChange={e => update('power_from', e.target.value)}
+            <NumericInputWithOptions
+              value={local.power_from}
+              onChange={val => update('power_from', val)}
+              options={options.powersFrom || []}
               placeholder="От"
-              min="0"
-              step="10"
+              min={0}
+              max={1000}
+              step={10}
+              formatOption={v => `${v} л.с.`}
             />
-            <input 
-              type="number" 
-              className="select flex-1" 
-              value={local.power_to || ''} 
-              onChange={e => update('power_to', e.target.value)}
+            <NumericInputWithOptions
+              value={local.power_to}
+              onChange={val => update('power_to', val)}
+              options={options.powersTo || []}
               placeholder="До"
-              min="0"
-              step="10"
+              min={0}
+              max={1000}
+              step={10}
+              formatOption={v => `${v} л.с.`}
             />
           </div>
         </div>
