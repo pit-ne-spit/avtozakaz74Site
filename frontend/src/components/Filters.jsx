@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SearchableSelect from './SearchableSelect';
 
 /**
  * Filters component - displays all search filters
@@ -35,122 +36,108 @@ export default function Filters({ value, onChange, onSearch, options, loading })
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Brand */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Бренд</label>
-          <select 
-            className="select" 
-            value={local.brandname || ''} 
-            onChange={e => update('brandname', e.target.value)}
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Бренд</label>
+          <SearchableSelect
+            value={local.brandname || ''}
+            onChange={val => update('brandname', val)}
+            options={options.brands || []}
+            placeholder="Все бренды"
+            loading={options.loadingBrands}
             disabled={options.loadingBrands}
-          >
-            <option value="">{options.loadingBrands ? 'Загрузка...' : 'Все бренды'}</option>
-            {options.brands && options.brands.map(b => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
+          />
         </div>
         
         {/* Model */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Модель</label>
-          <select 
-            className="select" 
-            value={local.seriesname || ''} 
-            onChange={e => update('seriesname', e.target.value)}
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Модель</label>
+          <SearchableSelect
+            value={local.seriesname || ''}
+            onChange={val => update('seriesname', val)}
+            options={options.models || []}
+            placeholder={!local.brandname ? 'Выберите бренд' : 'Все модели'}
+            loading={options.loadingModels}
             disabled={!local.brandname || options.loadingModels}
-          >
-            <option value="">
-              {!local.brandname ? 'Выберите бренд' : (options.loadingModels ? 'Загрузка...' : 'Все модели')}
-            </option>
-            {options.models && options.models.map(m => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
+          />
         </div>
 
         {/* Year Range */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Год</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Год</label>
           <div className="flex gap-2">
-            <select 
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.year_from || ''} 
               onChange={e => update('year_from', e.target.value)}
-            >
-              <option value="">От</option>
-              {options.years.map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-            <select 
+              placeholder="От"
+              min="1980"
+              max="2025"
+            />
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.year_to || ''} 
               onChange={e => update('year_to', e.target.value)}
-            >
-              <option value="">До</option>
-              {options.years.map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
+              placeholder="До"
+              min="1980"
+              max="2025"
+            />
           </div>
         </div>
 
         {/* Price Range */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Цена (₽)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Цена (₽)</label>
           <div className="flex gap-2">
-            <select 
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.total_price_rub_min || ''} 
               onChange={e => update('total_price_rub_min', e.target.value)}
-            >
-              <option value="">От</option>
-              {options.prices.map(v => (
-                <option key={v} value={v}>{(v / 1000000).toFixed(1)} млн</option>
-              ))}
-            </select>
-            <select 
+              placeholder="От"
+              min="0"
+              step="100000"
+            />
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.total_price_rub_max || ''} 
               onChange={e => update('total_price_rub_max', e.target.value)}
-            >
-              <option value="">До</option>
-              {options.prices.map(v => (
-                <option key={v} value={v}>{(v / 1000000).toFixed(1)} млн</option>
-              ))}
-            </select>
+              placeholder="До"
+              min="0"
+              step="100000"
+            />
           </div>
         </div>
 
         {/* Mileage */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Пробег (км)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Пробег (км)</label>
           <div className="flex gap-2">
-            <select 
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.mileage_from || ''} 
               onChange={e => update('mileage_from', e.target.value)}
-            >
-              <option value="">От</option>
-              {options.mileages.map(v => (
-                <option key={v} value={v}>{v.toLocaleString('ru-RU')}</option>
-              ))}
-            </select>
-            <select 
+              placeholder="От"
+              min="0"
+              step="10000"
+            />
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.mileage_to || ''} 
               onChange={e => update('mileage_to', e.target.value)}
-            >
-              <option value="">До</option>
-              {options.mileages.map(v => (
-                <option key={v} value={v}>{v.toLocaleString('ru-RU')}</option>
-              ))}
-            </select>
+              placeholder="До"
+              min="0"
+              step="10000"
+            />
           </div>
         </div>
 
         {/* Fuel Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Тип топлива</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Тип топлива</label>
           <select 
             className="select" 
             value={local.fuel_type || ''} 
@@ -165,55 +152,53 @@ export default function Filters({ value, onChange, onSearch, options, loading })
 
         {/* Engine Volume */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Объем двигателя (мл)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Объем двигателя (л)</label>
           <div className="flex gap-2">
-            <select 
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.engine_volume_from || ''} 
               onChange={e => update('engine_volume_from', e.target.value)}
-            >
-              <option value="">От</option>
-              {options.engineVolumes.map(v => (
-                <option key={v} value={v}>{(v/1000).toFixed(1)}L</option>
-              ))}
-            </select>
-            <select 
+              placeholder="От"
+              min="0"
+              max="10"
+              step="0.1"
+            />
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.engine_volume_to || ''} 
               onChange={e => update('engine_volume_to', e.target.value)}
-            >
-              <option value="">До</option>
-              {options.engineVolumes.map(v => (
-                <option key={v} value={v}>{(v/1000).toFixed(1)}L</option>
-              ))}
-            </select>
+              placeholder="До"
+              min="0"
+              max="10"
+              step="0.1"
+            />
           </div>
         </div>
 
         {/* Power */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Мощность (кВт)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Мощность (л.с.)</label>
           <div className="flex gap-2">
-            <select 
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.power_from || ''} 
               onChange={e => update('power_from', e.target.value)}
-            >
-              <option value="">От</option>
-              {options.powers.map(v => (
-                <option key={v} value={v}>{v}</option>
-              ))}
-            </select>
-            <select 
+              placeholder="От"
+              min="0"
+              step="10"
+            />
+            <input 
+              type="number" 
               className="select flex-1" 
               value={local.power_to || ''} 
               onChange={e => update('power_to', e.target.value)}
-            >
-              <option value="">До</option>
-              {options.powers.map(v => (
-                <option key={v} value={v}>{v}</option>
-              ))}
-            </select>
+              placeholder="До"
+              min="0"
+              step="10"
+            />
           </div>
         </div>
       </div>

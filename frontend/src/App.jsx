@@ -65,10 +65,20 @@ export default function App() {
         offset: offset,
       };
       
-      // Add filters
+      // Add filters with conversions
       Object.entries(filterValues).forEach(([key, value]) => {
         if (value !== '' && value != null) {
-          params[key] = value;
+          // Convert engine volume from liters to milliliters
+          if (key === 'engine_volume_from' || key === 'engine_volume_to') {
+            params[key] = Math.round(parseFloat(value) * 1000);
+          }
+          // Convert power from HP to kW (HP / 1.36)
+          else if (key === 'power_from' || key === 'power_to') {
+            params[key] = Math.round(parseFloat(value) / 1.36);
+          }
+          else {
+            params[key] = value;
+          }
         }
       });
 
@@ -155,32 +165,52 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg">
-        <div className="container mx-auto px-4 py-5">
+      <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-xl backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               <img 
-                src="/logo.jpg" 
-                alt="Logo" 
-                className="h-14 w-auto object-contain rounded-lg bg-white p-2 shadow-md"
+                src="/logo.png" 
+                alt="АвтоЗаказ3 74 Logo" 
+                className="h-20 w-auto object-contain drop-shadow-2xl"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">
-                  Заказ автомобилей из Китая
+                <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  АвтоЗаказ3 74
                 </h1>
-                <p className="text-blue-100 text-sm mt-1">
-                  🚗 Найдите свой идеальный автомобиль
+                <p className="text-blue-100 text-sm mt-1.5 font-medium">
+                  🚗 Покупаем и доставляем авто из Китая, Японии и Кореи
                 </p>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-4">
-              <div className="text-white text-right">
-                <div className="text-2xl font-bold">{total.toLocaleString()}</div>
-                <div className="text-blue-100 text-sm">авто в базе</div>
-              </div>
+            <div className="hidden lg:flex flex-col gap-2 text-white text-sm">
+              <a href="tel:+79026142503" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                +7 902 614-25-03 (Дмитрий)
+              </a>
+              <a href="tel:+79193028913" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                +7 919 302-89-13 (Максим)
+              </a>
+              <a href="tel:+79514502225" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                +7 951 450-22-25 (Максим)
+              </a>
+              <a href="https://t.me/avtozakaz74" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.223-.548.223l.188-2.85 5.18-4.68c.223-.198-.054-.308-.346-.11l-6.4 4.03-2.76-.918c-.6-.183-.612-.6.125-.89l10.782-4.156c.5-.18.943.11.78.89z"/>
+                </svg>
+                Telegram
+              </a>
             </div>
           </div>
         </div>
@@ -234,16 +264,18 @@ export default function App() {
 
         {/* Results count */}
         {!loading && !error && (
-          <div className="bg-white rounded-lg shadow-sm px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-gray-700">
-                Найдено <span className="font-bold text-blue-600 text-lg">{total.toLocaleString()}</span> автомобилей
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 flex items-center justify-between hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="text-gray-700 font-medium">
+                Найдено <span className="font-bold text-blue-600 text-xl">{total.toLocaleString()}</span> автомобилей
               </span>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 font-medium">
               Страница {page} из {Math.ceil(total / pageSize)}
             </div>
           </div>
@@ -290,32 +322,72 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-800 to-gray-900 mt-12">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+      <footer className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 mt-16 shadow-2xl">
+        <div className="container mx-auto px-4 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-white font-bold text-lg mb-2">О компании</h3>
-              <p className="text-gray-400 text-sm">
-                Профессиональный подбор и заказ автомобилей из Китая
+              <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                О компании
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Покупаем и доставляем авто из Китая, Японии и Кореи. Работаем напрямую с экспортными компаниями.
               </p>
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg mb-2">Контакты</h3>
-              <p className="text-gray-400 text-sm">
-                📧 info@example.com<br/>
-                📞 +7 (XXX) XXX-XX-XX
-              </p>
+              <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                Контакты
+              </h3>
+              <div className="space-y-2 text-sm">
+                <a href="tel:+79026142503" className="text-gray-300 hover:text-blue-400 transition-colors block">
+                  +7 902 614-25-03 (Дмитрий)
+                </a>
+                <a href="tel:+79193028913" className="text-gray-300 hover:text-blue-400 transition-colors block">
+                  +7 919 302-89-13 (Максим)
+                </a>
+                <a href="tel:+79514502225" className="text-gray-300 hover:text-blue-400 transition-colors block">
+                  +7 951 450-22-25 (Максим)
+                </a>
+                <a href="https://t.me/avtozakaz74" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-blue-400 transition-colors block flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.223-.548.223l.188-2.85 5.18-4.68c.223-.198-.054-.308-.346-.11l-6.4 4.03-2.76-.918c-.6-.183-.612-.6.125-.89l10.782-4.156c.5-.18.943.11.78.89z"/>
+                  </svg>
+                  Telegram-группа
+                </a>
+              </div>
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg mb-2">База данных</h3>
-              <p className="text-gray-400 text-sm">
-                🚗 {total.toLocaleString()} автомобилей<br/>
-                🔄 Ежедневное обновление
-              </p>
+              <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
+                  <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
+                  <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
+                </svg>
+                База данных
+              </h3>
+              <div className="space-y-2 text-sm text-gray-300">
+                <p className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {total.toLocaleString()} автомобилей
+                </p>
+                <p className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                  </svg>
+                  Ежедневное обновление
+                </p>
+              </div>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-6 pt-6 text-center">
-            <p className="text-gray-400 text-sm">&copy; 2025 Заказ автомобилей из Китая. Все права защищены.</p>
+          <div className="border-t border-gray-700 mt-8 pt-6 text-center">
+            <p className="text-gray-400 text-sm">&copy; 2025 АвтоЗаказ3 74. Все права защищены.</p>
           </div>
         </div>
       </footer>
