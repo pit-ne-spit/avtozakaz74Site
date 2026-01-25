@@ -52,7 +52,7 @@ export default function NumericInputWithOptions({
       {/* Dropdown */}
       {isOpen && options.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[210px] overflow-y-auto">
-          {options.slice(0, 5).map((opt, idx) => (
+          {options.map((opt, idx) => (
             <button
               key={idx}
               type="button"
