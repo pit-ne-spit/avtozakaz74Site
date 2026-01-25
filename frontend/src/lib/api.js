@@ -172,3 +172,51 @@ export async function fetchCarById(carId) {
   
   throw new Error(data.message || 'Не удалось загрузить детали автомобиля');
 }
+
+/**
+ * Get available filter options
+ * @param {string} fieldName - Field name to get options for (e.g., 'brandname', 'seriesname')
+ * @param {Object} filters - Optional filters to narrow down options
+ * @param {number} limit - Maximum number of options to return
+ * @param {number} offset - Offset for pagination
+ * @returns {Promise<Array>} Array of available values
+ */
+export async function fetchAvailableFilters(fieldName, filters = {}, limit = 100, offset = 0) {
+  console.log(`Fetching available filters for ${fieldName}`);
+  
+  const requestBody = {
+    fields_to_extract: fieldName,
+    limit: limit,
+    offset: offset
+  };
+  
+  // Add filters if provided
+  if (Object.keys(filters).length > 0) {
+    requestBody.filters = filters;
+  }
+  
+  const res = await fetch('/api/getAvailableFilters', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': API_TOKEN
+    },
+    body: JSON.stringify(requestBody)
+  });
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('API Error:', res.status, errorText);
+    throw new Error(`Ошибка API: ${res.status} ${res.statusText}`);
+  }
+  
+  const data = await res.json();
+  console.log('Available filters response:', data);
+  
+  if (data.status === 'success' && data.data && data.data.data) {
+    return data.data.data.values || [];
+  }
+  
+  return [];
+}

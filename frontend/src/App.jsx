@@ -3,7 +3,7 @@ import Filters from './components/Filters';
 import CarCard from './components/CarCard';
 import Pagination from './components/Pagination';
 import CarDetailModal from './components/CarDetailModal';
-import { fetchCars } from './lib/api';
+import { fetchCars, fetchAvailableFilters } from './lib/api';
 import './index.css';
 
 // Default filter values
@@ -23,10 +23,8 @@ const defaultFilters = {
   power_to: '',
 };
 
-// Options for dropdowns
-const options = {
-  brands: ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Toyota', 'Honda', 'Nissan', 'Mazda', 'Lexus', 'Porsche'],
-  models: [],
+// Static options for dropdowns
+const staticOptions = {
   fuelTypes: ['Gasoline', 'Diesel', 'Electric', 'Hybrid'],
   years: Array.from({ length: 40 }, (_, i) => 2025 - i),
   mileages: [0, 10000, 30000, 50000, 80000, 100000, 150000, 200000, 250000, 300000],
@@ -44,6 +42,12 @@ export default function App() {
   const [error, setError] = useState('');
   const [selectedCarId, setSelectedCarId] = useState(null);
   const [exchangeRate, setExchangeRate] = useState(null);
+  
+  // Dynamic filter options
+  const [brands, setBrands] = useState([]);
+  const [models, setModels] = useState([]);
+  const [loadingBrands, setLoadingBrands] = useState(false);
+  const [loadingModels, setLoadingModels] = useState(false);
 
   const pageSize = 10;
 
@@ -96,6 +100,47 @@ export default function App() {
   };
 
 
+  // Load brands on mount
+  useEffect(() => {
+    const loadBrands = async () => {
+      try {
+        setLoadingBrands(true);
+        const brandList = await fetchAvailableFilters('brandname', {}, 200);
+        setBrands(brandList);
+      } catch (err) {
+        console.error('Error loading brands:', err);
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+    
+    loadBrands();
+  }, []);
+  
+  // Load models when brand changes
+  useEffect(() => {
+    const loadModels = async () => {
+      if (!filters.brandname) {
+        setModels([]);
+        return;
+      }
+      
+      try {
+        setLoadingModels(true);
+        const modelList = await fetchAvailableFilters('seriesname', {
+          brandname: [filters.brandname]
+        }, 200);
+        setModels(modelList);
+      } catch (err) {
+        console.error('Error loading models:', err);
+      } finally {
+        setLoadingModels(false);
+      }
+    };
+    
+    loadModels();
+  }, [filters.brandname]);
+  
   // Load initial data
   useEffect(() => {
     load(1, defaultFilters);
@@ -148,7 +193,13 @@ export default function App() {
           value={filters}
           onChange={setFilters}
           onSearch={handleSearch}
-          options={options}
+          options={{
+            ...staticOptions,
+            brands,
+            models,
+            loadingBrands,
+            loadingModels
+          }}
           loading={loading}
         />
 

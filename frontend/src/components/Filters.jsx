@@ -12,6 +12,12 @@ export default function Filters({ value, onChange, onSearch, options, loading })
 
   const update = (field, val) => {
     const next = { ...local, [field]: val };
+    
+    // Reset model when brand changes
+    if (field === 'brandname') {
+      next.seriesname = '';
+    }
+    
     setLocal(next);
     onChange(next);
   };
@@ -34,10 +40,29 @@ export default function Filters({ value, onChange, onSearch, options, loading })
             className="select" 
             value={local.brandname || ''} 
             onChange={e => update('brandname', e.target.value)}
+            disabled={options.loadingBrands}
           >
-            <option value="">Все бренды</option>
-            {options.brands.map(b => (
+            <option value="">{options.loadingBrands ? 'Загрузка...' : 'Все бренды'}</option>
+            {options.brands && options.brands.map(b => (
               <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+        </div>
+        
+        {/* Model */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Модель</label>
+          <select 
+            className="select" 
+            value={local.seriesname || ''} 
+            onChange={e => update('seriesname', e.target.value)}
+            disabled={!local.brandname || options.loadingModels}
+          >
+            <option value="">
+              {!local.brandname ? 'Выберите бренд' : (options.loadingModels ? 'Загрузка...' : 'Все модели')}
+            </option>
+            {options.models && options.models.map(m => (
+              <option key={m} value={m}>{m}</option>
             ))}
           </select>
         </div>
