@@ -201,47 +201,48 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-xl backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - белый */}
+      <header className="bg-white shadow-md">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-5">
+            {/* Логотип и название */}
+            <div className="flex items-center gap-4">
               <img 
-                src="/logo.png" 
-                alt="АвтоЗаказ3 74 Logo" 
-                className="h-20 w-auto object-contain drop-shadow-2xl"
+                src="/logo_pic.png" 
+                alt="Автозаказ74 Logo" 
+                className="h-[70px] w-auto object-contain"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                  АвтоЗаказ3 74
-                </h1>
-                <p className="text-blue-100 text-sm mt-1.5 font-medium">
-                  🚗 Покупаем и доставляем авто из Китая, Японии и Кореи
-                </p>
-              </div>
+              <img 
+                src="/logo_text.png" 
+                alt="Автозаказ74" 
+                className="h-[53px] w-auto object-contain"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
             </div>
-            <div className="hidden lg:flex flex-col gap-2 text-white text-sm">
-              <a href="tel:+79026142503" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+            
+            {/* Контакты */}
+            <div className="hidden lg:flex items-center gap-6 text-sm">
+              <a href="tel:+79026142503" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
-                +7 902 614-25-03 (Дмитрий)
+                +7 902 614-25-03
               </a>
-              <a href="tel:+79193028913" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+              <a href="tel:+79193028913" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
-                +7 919 302-89-13 (Максим)
+                +7 919 302-89-13
               </a>
-              <a href="tel:+79514502225" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+              <a href="tel:+79514502225" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
-                +7 951 450-22-25 (Максим)
+                +7 951 450-22-25
               </a>
-              <a href="https://t.me/avtozakaz74" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors flex items-center gap-2">
+              <a href="https://t.me/avtozakaz74" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.223-.548.223l.188-2.85 5.18-4.68c.223-.198-.054-.308-.346-.11l-6.4 4.03-2.76-.918c-.6-.183-.612-.6.125-.89l10.782-4.156c.5-.18.943.11.78.89z"/>
                 </svg>
@@ -252,23 +253,36 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="container mx-auto px-4 py-6 space-y-6">
-        {/* Filters */}
-        <Filters
-          value={filters}
-          onChange={setFilters}
-          onSearch={handleSearch}
-          options={{
-            ...staticOptions,
-            brands,
-            models,
-            loadingBrands,
-            loadingModels
-          }}
-          loading={loading}
-        />
+      {/* Hero секция с фоном и фильтрами */}
+      <div className="relative">
+        {/* Фоновое изображение - увеличена высота на 15% */}
+        <div className="h-[575px] bg-cover bg-center relative" style={{backgroundImage: 'url(/background.jpg)'}}>
+          {/* Затемнение для лучшей читаемости */}
+          <div className="absolute inset-0 bg-black/30"></div>
+        </div>
+        
+        {/* Фильтры поверх изображения */}
+        <div className="absolute bottom-[60px] left-0 right-0 transform translate-y-1/2 z-10">
+          <div className="container mx-auto px-4">
+            <Filters
+              value={filters}
+              onChange={setFilters}
+              onSearch={handleSearch}
+              options={{
+                ...staticOptions,
+                brands,
+                models,
+                loadingBrands,
+                loadingModels
+              }}
+              loading={loading}
+            />
+          </div>
+        </div>
+      </div>
 
+      {/* Main content */}
+      <main className="container mx-auto px-4 pt-48 pb-6 space-y-6">
         {/* Error message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">

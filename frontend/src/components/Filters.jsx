@@ -25,7 +25,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 space-y-6 border border-gray-100">
+    <div className="bg-white/40 backdrop-blur-md rounded-xl shadow-lg p-6 space-y-6 border border-white/50">
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
         <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
