@@ -1,5 +1,7 @@
+import { useState, useRef, useEffect } from 'react';
+
 /**
- * NumericInputWithOptions - Numeric input with dropdown suggestions using datalist
+ * NumericInputWithOptions - Numeric input with dropdown suggestions
  */
 export default function NumericInputWithOptions({ 
   value, 
@@ -11,26 +13,59 @@ export default function NumericInputWithOptions({
   step = 1,
   formatOption = (v) => v.toLocaleString('ru-RU')
 }) {
-  const id = `numeric-input-${Math.random().toString(36).substr(2, 9)}`;
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (option) => {
+    onChange(option);
+    setIsOpen(false);
+  };
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative flex-1">
       <input
+        ref={inputRef}
         type="number"
-        list={id}
-        className="select flex-1"
+        className="select w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsOpen(true)}
         placeholder={placeholder}
         min={min}
         max={max}
         step={step}
       />
-      <datalist id={id}>
-        {options.map((opt, idx) => (
-          <option key={idx} value={opt} label={formatOption(opt)} />
-        ))}
-      </datalist>
+      
+      {/* Dropdown */}
+      {isOpen && options.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[210px] overflow-y-auto">
+          {options.slice(0, 5).map((opt, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSelect(opt)}
+              className={`w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors text-sm ${
+                value == opt ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+              }`}
+            >
+              {formatOption(opt)}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

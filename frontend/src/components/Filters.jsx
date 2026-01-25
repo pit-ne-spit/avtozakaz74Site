@@ -37,12 +37,12 @@ export default function Filters({ value, onChange, onSearch, options, loading })
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Brand */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Бренд</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Марка</label>
           <SearchableSelect
             value={local.brandname || ''}
             onChange={val => update('brandname', val)}
             options={options.brands || []}
-            placeholder="Все бренды"
+            placeholder="Все марки"
             loading={options.loadingBrands}
             disabled={options.loadingBrands}
           />
@@ -55,7 +55,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
             value={local.seriesname || ''}
             onChange={val => update('seriesname', val)}
             options={options.models || []}
-            placeholder={!local.brandname ? 'Выберите бренд' : 'Все модели'}
+            placeholder={!local.brandname ? 'Выберите марку' : 'Все модели'}
             loading={options.loadingModels}
             disabled={!local.brandname || options.loadingModels}
           />
@@ -73,6 +73,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={1980}
               max={2026}
               step={1}
+              formatOption={v => v}
             />
             <NumericInputWithOptions
               value={local.year_to}
@@ -82,6 +83,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={1980}
               max={2026}
               step={1}
+              formatOption={v => v}
             />
           </div>
         </div>
@@ -98,7 +100,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0}
               max={50000000}
               step={100000}
-              formatOption={v => `${(v / 1000000).toFixed(1)} млн`}
+              formatOption={v => v.toLocaleString('ru-RU')}
             />
             <NumericInputWithOptions
               value={local.total_price_rub_max}
@@ -108,7 +110,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0}
               max={50000000}
               step={100000}
-              formatOption={v => `${(v / 1000000).toFixed(1)} млн`}
+              formatOption={v => v.toLocaleString('ru-RU')}
             />
           </div>
         </div>
@@ -125,6 +127,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0}
               max={500000}
               step={10000}
+              formatOption={v => v.toLocaleString('ru-RU')}
             />
             <NumericInputWithOptions
               value={local.mileage_to}
@@ -134,6 +137,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0}
               max={500000}
               step={10000}
+              formatOption={v => v.toLocaleString('ru-RU')}
             />
           </div>
         </div>
@@ -165,7 +169,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0.1}
               max={10}
               step={0.1}
-              formatOption={v => `${v}L`}
+              formatOption={v => v}
             />
             <NumericInputWithOptions
               value={local.engine_volume_to}
@@ -175,7 +179,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0.1}
               max={10}
               step={0.1}
-              formatOption={v => `${v}L`}
+              formatOption={v => v}
             />
           </div>
         </div>
@@ -192,7 +196,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0}
               max={1000}
               step={10}
-              formatOption={v => `${v} л.с.`}
+              formatOption={v => v}
             />
             <NumericInputWithOptions
               value={local.power_to}
@@ -202,7 +206,7 @@ export default function Filters({ value, onChange, onSearch, options, loading })
               min={0}
               max={1000}
               step={10}
-              formatOption={v => `${v} л.с.`}
+              formatOption={v => v}
             />
           </div>
         </div>
