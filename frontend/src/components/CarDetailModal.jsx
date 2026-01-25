@@ -41,15 +41,11 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  // Parse photos
-  const photos = car?.photos ? (
-    typeof car.photos === 'string' ? JSON.parse(car.photos) : car.photos
-  ) : [];
+  // Parse photos from new API structure
+  const photos = car?.media_support?.photos || [];
 
-  // Add https:// to photos
-  const photoUrls = photos.map(url => 
-    url && url.startsWith('//') ? `https:${url}` : url
-  );
+  // Photos already have full URLs
+  const photoUrls = photos;
 
   const nextPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev + 1) % photoUrls.length);
@@ -59,8 +55,8 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
     setCurrentPhotoIndex((prev) => (prev - 1 + photoUrls.length) % photoUrls.length);
   };
 
-  // Calculate full price
-  const priceData = car ? calculateFullPrice(car.price, exchangeRate) : { totalFormatted: 'Загрузка...', breakdown: null };
+  // Calculate full price from new API structure
+  const priceData = car ? calculateFullPrice(car.pricing_finance?.price || 0, exchangeRate) : { totalFormatted: 'Загрузка...', breakdown: null };
   const breakdown = priceData.breakdown ? formatPriceBreakdown(priceData.breakdown) : null;
 
   return (
@@ -106,7 +102,7 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
                   <>
                     <img
                       src={photoUrls[currentPhotoIndex]}
-                      alt={`${car.brand} ${car.model}`}
+                      alt={`${car.vehicle_info?.brandname} ${car.vehicle_info?.seriesname}`}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                       crossOrigin="anonymous"
@@ -178,14 +174,14 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
               {/* Header */}
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  {car.brand} {car.model}
+                  {car.vehicle_info?.brandname} {car.vehicle_info?.seriesname}
                 </h2>
                 <div className="flex items-center gap-3">
                   <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
-                    {car.year}
+                    {car.vehicle_info?.firstregyear}
                   </span>
-                  {car.color_en && (
-                    <span className="text-gray-600">• {car.color_en}</span>
+                  {car.vehicle_info?.colorname && (
+                    <span className="text-gray-600">• {car.vehicle_info.colorname}</span>
                   )}
                 </div>
               </div>
@@ -254,7 +250,7 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
                 <h3 className="text-lg font-bold text-gray-800">Характеристики</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  {car.mileage && (
+                  {car.vehicle_info?.mileage && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -262,61 +258,61 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
                       <div>
                         <div className="text-xs text-gray-500">Пробег</div>
                         <div className="font-semibold text-gray-900">
-                          {new Intl.NumberFormat('ru-RU').format(car.mileage)} км
+                          {new Intl.NumberFormat('ru-RU').format(car.vehicle_info.mileage * 10000)} км
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {car.transmission && (
+                  {car.technical_specs?.gearbox && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                       </svg>
                       <div>
                         <div className="text-xs text-gray-500">КПП</div>
-                        <div className="font-semibold text-gray-900">{car.transmission}</div>
+                        <div className="font-semibold text-gray-900">{car.technical_specs.gearbox}</div>
                       </div>
                     </div>
                   )}
 
-                  {car.body_type && (
+                  {car.vehicle_info?.levelname && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <div>
                         <div className="text-xs text-gray-500">Тип кузова</div>
-                        <div className="font-semibold text-gray-900">{car.body_type}</div>
+                        <div className="font-semibold text-gray-900">{car.vehicle_info.levelname}</div>
                       </div>
                     </div>
                   )}
 
-                  {car.engine_displacement && (
+                  {car.technical_specs?.displacement && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                       </svg>
                       <div>
                         <div className="text-xs text-gray-500">Объем двигателя</div>
-                        <div className="font-semibold text-gray-900">{car.engine_displacement}L</div>
+                        <div className="font-semibold text-gray-900">{car.technical_specs.displacement}L</div>
                       </div>
                     </div>
                   )}
 
-                  {car.horsepower && (
+                  {car.technical_specs?.engine && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       <div>
-                        <div className="text-xs text-gray-500">Мощность</div>
-                        <div className="font-semibold text-gray-900">{car.horsepower} л.с.</div>
+                        <div className="text-xs text-gray-500">Двигатель</div>
+                        <div className="font-semibold text-gray-900">{car.technical_specs.engine}</div>
                       </div>
                     </div>
                   )}
 
-                  {car.city_en && (
+                  {car.vehicle_info?.cname && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -324,7 +320,7 @@ export default function CarDetailModal({ carId, exchangeRate, onClose }) {
                       </svg>
                       <div>
                         <div className="text-xs text-gray-500">Город</div>
-                        <div className="font-semibold text-gray-900">{car.city_en}</div>
+                        <div className="font-semibold text-gray-900">{car.vehicle_info.cname}</div>
                       </div>
                     </div>
                   )}
