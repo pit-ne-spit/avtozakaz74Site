@@ -109,7 +109,15 @@ Current token format: `che168-XXXXXXXXXXXXX` in Authorization header.
 1. Add field to `defaultFilters` in `App.jsx`
 2. Add transformation logic in `api.js` `transformFiltersToApiFormat()`
 3. Add UI control in `Filters.jsx`
-4. Update options in `App.jsx` if it's a dropdown/select
+4. For static options: Update `staticOptions` in `App.jsx`
+5. For dynamic options: Use `fetchAvailableFilters()` in useEffect hook
+
+### Dynamic Filters
+Brands and models are loaded dynamically from API:
+- `brands` - Loaded on component mount from `/che168/getAvailableFilters`
+- `models` - Loaded when brand changes, filtered by selected brand
+- Model filter resets automatically when brand changes
+- Loading states shown in dropdowns during fetch
 
 ### Working with Car Data
 Always use the correct field names:
