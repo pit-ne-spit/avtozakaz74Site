@@ -1,17 +1,28 @@
 /**
  * Currency utilities for che168 API
- * API provides exchange rates and calculated prices
+ * Calculates full price with all fees according to business logic
  */
 
 /**
- * Format price using data from API
- * API provides total_price_rub with all fees included
+ * Calculate full price with all fees
  * 
- * @param {object} car - Car object from API
- * @returns {object} Formatted price data
+ * Formula:
+ * - Цена автомобиля в Китае = price_cny * rate_CNY
+ * - Единая ставка налога = import_duty_eur * rate_EUR (конвертация из EUR в RUB)
+ * - Таможенное оформление = customs_fee_rub
+ * - Утилизационный сбор = recycling_fee_rub
+ * - Услуги подбора и доставки по Китаю = 15000 * rate_CNY
+ * - Услуги таможенного брокера и лаборатория = 75 000 руб
+ * - Комиссия Автозаказ 74 = 150 000 руб
+ * 
+ * @param {number} priceCny - Price in CNY from API
+ * @param {number} exchangeRateCny - CNY to RUB exchange rate
+ * @param {object} fees - Object with import_duty (EUR), customs_fee_rub, recycling_fee_rub
+ * @param {number} exchangeRateEur - EUR to RUB exchange rate
+ * @returns {object} Formatted price data with breakdown
  */
-export function calculateFullPrice(car) {
-  if (!car || !car.total_price_rub) {
+export function calculateFullPrice(priceCny, exchangeRateCny, fees = {}, exchangeRateEur = 0) {
+  if (!priceCny || !exchangeRateCny) {
     return {
       total: null,
       totalFormatted: 'Цена не указана',
@@ -19,38 +30,65 @@ export function calculateFullPrice(car) {
     };
   }
 
-  const totalRub = car.total_price_rub;
+  // Расчёт составляющих
+  const priceInRub = priceCny * exchangeRateCny;
+  const importDutyEur = fees.import_duty || 0;
+  const importDutyRub = importDutyEur * exchangeRateEur; // Конвертация EUR → RUB
+  const customsFee = fees.customs_fee_rub || 0;
+  const recyclingFee = fees.recycling_fee_rub || 0;
+  const chinaServices = 15000 * exchangeRateCny;
+  const brokerServices = 75000;
+  const commission = 150000;
+  
+  // Итоговая стоимость
+  const totalRub = priceInRub + importDutyRub + customsFee + recyclingFee + chinaServices + brokerServices + commission;
   const totalFormatted = `${(totalRub / 1000000).toFixed(2)} млн ₽`;
   
   return {
     total: totalRub,
     totalFormatted,
     breakdown: {
-      baseCny: car.price_cny,
+      priceCny: priceCny,
+      priceInRub: priceInRub,
+      importDutyEur: importDutyEur,
+      importDutyRub: importDutyRub,
+      customsFee: customsFee,
+      recyclingFee: recyclingFee,
+      chinaServices: chinaServices,
+      brokerServices: brokerServices,
+      commission: commission,
       totalRub: totalRub,
-      customsFee: car.customs_fee_rub || 0,
-      recyclingFee: car.recycling_fee_rub || 0,
-      importDuty: car.import_duty || 0
+      rateCny: exchangeRateCny,
+      rateEur: exchangeRateEur
     }
   };
 }
 
 /**
  * Format price breakdown for display
+ * @param {object} breakdown - Breakdown from calculateFullPrice
+ * @returns {object} Formatted breakdown for UI
  */
 export function formatPriceBreakdown(breakdown) {
   if (!breakdown) return null;
   
   const fmt = (num) => new Intl.NumberFormat('ru-RU').format(Math.round(num));
+  const fmtCny = (num) => new Intl.NumberFormat('ru-RU').format(Math.round(num));
   
   return {
     steps: [
       {
-        label: 'Цена автомобиля',
-        value: `¥${fmt(breakdown.baseCny)}`
+        label: 'Цена автомобиля в Китае',
+        value: `${fmt(breakdown.priceInRub)} ₽`,
+        subValue: `¥${fmtCny(breakdown.priceCny)}`
       },
       {
-        label: 'Таможенная пошлина',
+        label: 'Единая ставка налога',
+        value: `${fmt(breakdown.importDutyRub)} ₽`,
+        subValue: `€${fmtCny(breakdown.importDutyEur)}`
+      },
+      {
+        label: 'Таможенное оформление',
         value: `${fmt(breakdown.customsFee)} ₽`
       },
       {
@@ -58,12 +96,25 @@ export function formatPriceBreakdown(breakdown) {
         value: `${fmt(breakdown.recyclingFee)} ₽`
       },
       {
-        label: 'ИТОГО',
+        label: 'Услуги подбора и доставки по Китаю',
+        value: `${fmt(breakdown.chinaServices)} ₽`,
+        subValue: `¥15 000`
+      },
+      {
+        label: 'Услуги таможенного брокера и лаборатория',
+        value: `${fmt(breakdown.brokerServices)} ₽`
+      },
+      {
+        label: 'Комиссия Автозаказ74',
+        value: `${fmt(breakdown.commission)} ₽`
+      },
+      {
+        label: 'ПОЛНАЯ СТОИМОСТЬ В РОССИИ',
         value: `${fmt(breakdown.totalRub)} ₽`,
         isTotal: true
       }
     ],
-    total: `${fmt(breakdown.totalRub)} ₽`,
-    totalShort: `${(breakdown.totalRub / 1000000).toFixed(2)} млн ₽`
+    rateCny: breakdown.rateCny,
+    rateEur: breakdown.rateEur
   };
 }

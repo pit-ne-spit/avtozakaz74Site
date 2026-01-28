@@ -3,12 +3,14 @@ import Filters from './components/Filters';
 import CarCard from './components/CarCard';
 import Pagination from './components/Pagination';
 import CarDetailModal from './components/CarDetailModal';
+import SortSelector from './components/SortSelector';
 import { fetchCars, fetchAvailableFilters } from './lib/api';
+import brandsList from '../brandname.json';
 import './index.css';
 
 // Default filter values
 const defaultFilters = {
-  brandname: '',
+  brandname: [],
   seriesname: '',
   year_from: '',
   year_to: '',
@@ -25,7 +27,7 @@ const defaultFilters = {
 
 // Static options for dropdowns
 const staticOptions = {
-  fuelTypes: ['Gasoline', 'Diesel', 'Electric', 'Hybrid'],
+  fuelTypes: ['Бензин', 'Дизель', 'Гибрид', 'Электричество'],
   
   // Year options: 2005-2026
   yearsFrom: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
@@ -76,8 +78,10 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedCarId, setSelectedCarId] = useState(null);
-  const [exchangeRate, setExchangeRate] = useState(null);
+  const [selectedCar, setSelectedCar] = useState(null);
+  const [exchangeRates, setExchangeRates] = useState({ CNY: null, EUR: null });
+  const [sortBy, setSortBy] = useState('infoid');
+  const [sortDirection, setSortDirection] = useState('DESC');
   
   // Dynamic filter options
   const [brands, setBrands] = useState([]);
@@ -87,7 +91,7 @@ export default function App() {
 
   const pageSize = 10;
 
-  const load = async (pageNum = 1, filterValues = filters) => {
+  const load = async (pageNum = 1, filterValues = filters, sortByValue = sortBy, sortDirValue = sortDirection) => {
     setLoading(true);
     setError('');
     
@@ -99,10 +103,15 @@ export default function App() {
       const params = {
         limit: pageSize,
         offset: offset,
+        sort_by: sortByValue,
+        sort_direction: sortDirValue,
       };
       
       // Add filters with conversions
       Object.entries(filterValues).forEach(([key, value]) => {
+        // Skip empty arrays
+        if (Array.isArray(value) && value.length === 0) return;
+        
         if (value !== '' && value != null) {
           // Convert engine volume from liters to milliliters
           if (key === 'engine_volume_from' || key === 'engine_volume_to') {
@@ -124,9 +133,12 @@ export default function App() {
       const carsArray = data.cars || [];
       const totalCount = data.total || 0;
       
-      // Update exchange rate from API response
-      if (data.rates && data.rates.CNY) {
-        setExchangeRate(data.rates.CNY);
+      // Update exchange rates from API response
+      if (data.rates) {
+        setExchangeRates({
+          CNY: data.rates.CNY || null,
+          EUR: data.rates.EUR || null
+        });
       }
       
       setItems(carsArray);
@@ -146,27 +158,26 @@ export default function App() {
   };
 
 
-  // Load brands on mount
+  // Load brands from local JSON file on mount
   useEffect(() => {
-    const loadBrands = async () => {
-      try {
-        setLoadingBrands(true);
-        const brandList = await fetchAvailableFilters('brandname', {}, 200);
-        setBrands(brandList);
-      } catch (err) {
-        console.error('Error loading brands:', err);
-      } finally {
-        setLoadingBrands(false);
-      }
-    };
-    
-    loadBrands();
+    try {
+      setLoadingBrands(true);
+      // brandsList.values contains the array of brand names
+      setBrands(brandsList.values || brandsList);
+    } catch (err) {
+      console.error('Error loading brands from JSON:', err);
+    } finally {
+      setLoadingBrands(false);
+    }
   }, []);
   
   // Load models when brand changes
   useEffect(() => {
     const loadModels = async () => {
-      if (!filters.brandname) {
+      const brandValue = filters.brandname;
+      const brands = Array.isArray(brandValue) ? brandValue : (brandValue ? [brandValue] : []);
+      
+      if (brands.length === 0) {
         setModels([]);
         return;
       }
@@ -174,7 +185,7 @@ export default function App() {
       try {
         setLoadingModels(true);
         const modelList = await fetchAvailableFilters('seriesname', {
-          brandname: [filters.brandname]
+          brandname: brands
         }, 200);
         setModels(modelList);
       } catch (err) {
@@ -193,11 +204,19 @@ export default function App() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = () => {
-    load(1, filters);
+    load(1, filters, sortBy, sortDirection);
   };
 
   const handlePageChange = (newPage) => {
-    load(newPage, filters);
+    load(newPage, filters, sortBy, sortDirection);
+  };
+  
+  const handleSortChange = (newSortBy) => {
+    // Toggle direction if clicking the same field
+    const newDirection = (newSortBy === sortBy && sortDirection === 'DESC') ? 'ASC' : 'DESC';
+    setSortBy(newSortBy);
+    setSortDirection(newDirection);
+    load(1, filters, newSortBy, newDirection);
   };
 
   return (
@@ -282,7 +301,7 @@ export default function App() {
       </div>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 pt-48 pb-6 space-y-6">
+      <main className="container mx-auto px-4 pt-64 pb-6 space-y-6">
         {/* Error message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -312,23 +331,32 @@ export default function App() {
           </div>
         )}
 
-        {/* Results count */}
+        {/* Results count and sorting */}
         {!loading && !error && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 flex items-center justify-between hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <>
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 flex items-center justify-between hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-gray-700 font-medium">
+                  Найдено <span className="font-bold text-blue-600 text-xl">{total.toLocaleString()}</span> автомобилей
+                </span>
               </div>
-              <span className="text-gray-700 font-medium">
-                Найдено <span className="font-bold text-blue-600 text-xl">{total.toLocaleString()}</span> автомобилей
-              </span>
+              <div className="text-sm text-gray-500 font-medium">
+                Страница {page} из {Math.ceil(total / pageSize)}
+              </div>
             </div>
-            <div className="text-sm text-gray-500 font-medium">
-              Страница {page} из {Math.ceil(total / pageSize)}
-            </div>
-          </div>
+            
+            {/* Sort selector */}
+            <SortSelector
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              onChange={handleSortChange}
+            />
+          </>
         )}
 
         {/* Empty state */}
@@ -354,8 +382,8 @@ export default function App() {
                 <CarCard 
                   key={car.infoid} 
                   car={car}
-                  exchangeRate={exchangeRate}
-                  onClick={() => setSelectedCarId(car.infoid)}
+                  exchangeRates={exchangeRates}
+                  onClick={() => setSelectedCar(car)}
                 />
               ))}
             </div>
@@ -443,11 +471,11 @@ export default function App() {
       </footer>
 
       {/* Car Detail Modal */}
-      {selectedCarId && (
+      {selectedCar && (
         <CarDetailModal 
-          carId={selectedCarId}
-          exchangeRate={exchangeRate}
-          onClose={() => setSelectedCarId(null)}
+          car={selectedCar}
+          exchangeRates={exchangeRates}
+          onClose={() => setSelectedCar(null)}
         />
       )}
     </div>

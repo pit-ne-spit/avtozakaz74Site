@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: avtozakaz74-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - avtozakaz74-network
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "com.avtozakaz74.description=Avtozakaz74 Frontend"
+
+networks:
+  avtozakaz74-network:
+    driver: bridge

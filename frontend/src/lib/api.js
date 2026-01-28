@@ -2,6 +2,8 @@
  * API utility for fetching car listings from che168 API
  */
 
+import { categoryToApiFuelTypes } from './fuelTypes';
+
 const API_TOKEN = 'che168-Onh9OZEJchYMZgdXy';
 
 /**
@@ -10,7 +12,7 @@ const API_TOKEN = 'che168-Onh9OZEJchYMZgdXy';
  * @returns {Object} Formatted request body
  */
 function transformFiltersToApiFormat(params) {
-  const { limit = 20, offset = 0, ...filters } = params;
+  const { limit = 20, offset = 0, sort_by = 'infoid', sort_direction = 'DESC', ...filters } = params;
   
   const apiFilters = {};
   
@@ -28,11 +30,12 @@ function transformFiltersToApiFormat(params) {
       : [filters.seriesname];
   }
   
-  // Transform fuel_type (array)
+  // Transform fuel_type (array) - convert simplified category to API values
   if (filters.fuel_type) {
-    apiFilters.fuel_type = Array.isArray(filters.fuel_type)
-      ? filters.fuel_type
-      : [filters.fuel_type];
+    const apiFuelTypes = categoryToApiFuelTypes(filters.fuel_type);
+    if (apiFuelTypes.length > 0) {
+      apiFilters.fuel_type = apiFuelTypes;
+    }
   }
   
   // Transform city (array)
@@ -91,8 +94,8 @@ function transformFiltersToApiFormat(params) {
       offset: offset
     },
     sorting: {
-      sort_by: 'infoid',
-      sort_direction: 'DESC'
+      sort_by: sort_by,
+      sort_direction: sort_direction
     }
   };
 }

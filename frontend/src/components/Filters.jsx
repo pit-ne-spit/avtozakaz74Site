@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import SearchableSelect from './SearchableSelect';
+import MultiSearchableSelect from './MultiSearchableSelect';
 import NumericInputWithOptions from './NumericInputWithOptions';
+import FilterPresets from './FilterPresets';
 
 /**
  * Filters component - displays all search filters
@@ -23,6 +25,21 @@ export default function Filters({ value, onChange, onSearch, options, loading })
     setLocal(next);
     onChange(next);
   };
+  
+  // Check if any brand is selected (for array or string)
+  const hasBrandSelected = () => {
+    const brandValue = local.brandname;
+    if (Array.isArray(brandValue)) {
+      return brandValue.length > 0;
+    }
+    return !!brandValue;
+  };
+  
+  const applyPreset = (presetFilters) => {
+    const next = { ...local, ...presetFilters };
+    setLocal(next);
+    onChange(next);
+  };
 
   return (
     <div className="bg-white/40 backdrop-blur-md rounded-xl shadow-lg p-6 space-y-6 border border-white/50">
@@ -33,13 +50,16 @@ export default function Filters({ value, onChange, onSearch, options, loading })
         </svg>
         <h2 className="text-xl font-bold text-gray-800">Фильтры поиска</h2>
       </div>
+      
+      {/* Presets */}
+      <FilterPresets onApplyPreset={applyPreset} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Brand */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Марка</label>
-          <SearchableSelect
-            value={local.brandname || ''}
+          <MultiSearchableSelect
+            value={local.brandname || []}
             onChange={val => update('brandname', val)}
             options={options.brands || []}
             placeholder="Все марки"
@@ -55,9 +75,9 @@ export default function Filters({ value, onChange, onSearch, options, loading })
             value={local.seriesname || ''}
             onChange={val => update('seriesname', val)}
             options={options.models || []}
-            placeholder={!local.brandname ? 'Выберите марку' : 'Все модели'}
+            placeholder={!hasBrandSelected() ? 'Выберите марку' : 'Все модели'}
             loading={options.loadingModels}
-            disabled={!local.brandname || options.loadingModels}
+            disabled={!hasBrandSelected() || options.loadingModels}
           />
         </div>
 

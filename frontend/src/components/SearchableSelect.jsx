@@ -70,24 +70,22 @@ export default function SearchableSelect({
         <span className={value ? 'text-gray-900' : 'text-gray-500'}>
           {loading ? 'Загрузка...' : displayText}
         </span>
-        <div className="flex items-center gap-1">
-          {value && !disabled && !loading && (
-            <svg
-              onClick={handleClear}
-              className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          )}
-        </div>
+        {value && !disabled && !loading && (
+          <svg
+            onClick={handleClear}
+            className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        )}
       </button>
 
       {/* Dropdown */}

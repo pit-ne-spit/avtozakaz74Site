@@ -1,0 +1,11 @@
+.git
+.gitignore
+*.md
+.vscode
+.idea
+*.jpg
+*.png
+!frontend/public/*.png
+!frontend/public/*.jpg
+api_specification.json
+AGENTS.md
