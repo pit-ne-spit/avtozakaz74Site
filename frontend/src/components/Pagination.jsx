@@ -13,31 +13,41 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
     }
   };
 
-  // Generate page numbers to display (max 7)
+  // Generate page numbers to display (max 9: 1 ... prev-2 prev-1 current next+1 next+2 ... last)
   const getPageNumbers = () => {
     const pages = [];
-    const maxVisible = 7;
+    const maxVisible = 9; // 1 + ... + 5 pages + ... + last
     
     if (totalPages <= maxVisible) {
+      // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      if (page <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
+      // Always show first page
+      pages.push(1);
+      
+      // Calculate range around current page (2 pages on each side)
+      const rangeStart = Math.max(2, page - 2);
+      const rangeEnd = Math.min(totalPages - 1, page + 2);
+      
+      // Add ellipsis after first page if needed
+      if (rangeStart > 2) {
         pages.push('...');
-        pages.push(totalPages);
-      } else if (page >= totalPages - 3) {
-        pages.push(1);
-        pages.push('...');
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = page - 1; i <= page + 1; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
       }
+      
+      // Add pages around current page
+      for (let i = rangeStart; i <= rangeEnd; i++) {
+        pages.push(i);
+      }
+      
+      // Add ellipsis before last page if needed
+      if (rangeEnd < totalPages - 1) {
+        pages.push('...');
+      }
+      
+      // Always show last page
+      pages.push(totalPages);
     }
     
     return pages;
