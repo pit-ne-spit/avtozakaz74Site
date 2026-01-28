@@ -16,6 +16,8 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   const [error, setError] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const [thumbnailPage, setThumbnailPage] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const loadCarDetails = async () => {
@@ -53,11 +55,21 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   const photoUrls = photos;
 
   const nextPhoto = () => {
-    setCurrentPhotoIndex((prev) => (prev + 1) % photoUrls.length);
+    const newIndex = (currentPhotoIndex + 1) % photoUrls.length;
+    setCurrentPhotoIndex(newIndex);
+    // Auto-scroll thumbnails if needed
+    const thumbnailsPerPage = 10;
+    const newPage = Math.floor(newIndex / thumbnailsPerPage);
+    setThumbnailPage(newPage);
   };
 
   const prevPhoto = () => {
-    setCurrentPhotoIndex((prev) => (prev - 1 + photoUrls.length) % photoUrls.length);
+    const newIndex = (currentPhotoIndex - 1 + photoUrls.length) % photoUrls.length;
+    setCurrentPhotoIndex(newIndex);
+    // Auto-scroll thumbnails if needed
+    const thumbnailsPerPage = 10;
+    const newPage = Math.floor(newIndex / thumbnailsPerPage);
+    setThumbnailPage(newPage);
   };
 
   // Calculate full price using financial data from search_car
@@ -137,7 +149,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
             {/* Photo Gallery */}
             <div className="space-y-4">
-              <div className="relative bg-gray-100 rounded-xl overflow-hidden aspect-[4/3]">
+              <div className="relative bg-gray-100 rounded-xl overflow-hidden aspect-[4/3] cursor-zoom-in" onClick={() => setIsFullscreen(true)}>
                 {photoUrls.length > 0 ? (
                   <>
                     <img
@@ -187,24 +199,58 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
               {/* Thumbnail gallery */}
               {photoUrls.length > 1 && (
-                <div className="grid grid-cols-5 gap-2">
-                  {photoUrls.slice(0, 10).map((url, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentPhotoIndex(idx)}
-                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                        idx === currentPhotoIndex ? 'border-blue-600 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
-                      }`}
-                    >
-                      <img
-                        src={url}
-                        alt={`Thumbnail ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                        crossOrigin="anonymous"
-                      />
-                    </button>
-                  ))}
+                <div className="space-y-2">
+                  <div className="grid grid-cols-5 gap-2">
+                    {photoUrls.slice(thumbnailPage * 10, (thumbnailPage + 1) * 10).map((url, idx) => {
+                      const actualIndex = thumbnailPage * 10 + idx;
+                      return (
+                        <button
+                          key={actualIndex}
+                          onClick={() => setCurrentPhotoIndex(actualIndex)}
+                          className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                            actualIndex === currentPhotoIndex ? 'border-blue-600 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          <img
+                            src={url}
+                            alt={`Thumbnail ${actualIndex + 1}`}
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                            crossOrigin="anonymous"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Thumbnail pagination */}
+                  {photoUrls.length > 10 && (
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setThumbnailPage(Math.max(0, thumbnailPage - 1))}
+                        disabled={thumbnailPage === 0}
+                        className="p-1 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      
+                      <span className="text-xs text-gray-600">
+                        {thumbnailPage + 1} / {Math.ceil(photoUrls.length / 10)}
+                      </span>
+                      
+                      <button
+                        onClick={() => setThumbnailPage(Math.min(Math.ceil(photoUrls.length / 10) - 1, thumbnailPage + 1))}
+                        disabled={thumbnailPage >= Math.ceil(photoUrls.length / 10) - 1}
+                        className="p-1 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -436,6 +482,63 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
           </div>
         )}
       </div>
+
+      {/* Fullscreen photo viewer */}
+      {isFullscreen && photoUrls.length > 0 && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black bg-opacity-95 flex items-center justify-center"
+          onClick={() => setIsFullscreen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 right-4 z-10 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-3 transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Main fullscreen image */}
+          <div className="relative w-full h-full flex items-center justify-center p-8" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={photoUrls[currentPhotoIndex]}
+              alt={`Photo ${currentPhotoIndex + 1}`}
+              className="max-w-full max-h-full object-contain"
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
+            />
+
+            {/* Navigation arrows */}
+            {photoUrls.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); prevPhoto(); }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-3 transition-colors"
+                >
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={(e) => { e.stopPropagation(); nextPhoto(); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-3 transition-colors"
+                >
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Photo counter */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-60 text-white px-4 py-2 rounded-full text-sm">
+              {currentPhotoIndex + 1} / {photoUrls.length}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
