@@ -1,5 +1,6 @@
 import { calculateFullPrice } from '../lib/currency';
 import { apiFuelTypeToCategory } from '../lib/fuelTypes';
+import { getDisplayBrandName } from '../lib/brandMapping';
 
 /**
  * Car card component - displays single car listing
@@ -10,6 +11,9 @@ export default function CarCard({ car, exchangeRates, onClick }) {
   if (imageUrl && imageUrl.startsWith('//')) {
     imageUrl = 'https:' + imageUrl;
   }
+  
+  // Get display brand name
+  const displayBrandName = getDisplayBrandName(car.brandname);
 
   // Calculate full price with all fees
   const priceData = calculateFullPrice(
@@ -33,7 +37,7 @@ export default function CarCard({ car, exchangeRates, onClick }) {
         <img 
           className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500" 
           src={imageUrl} 
-          alt={car.carname || `${car.brandname} ${car.seriesname}`}
+          alt={car.carname || `${displayBrandName} ${car.seriesname}`}
           referrerPolicy="no-referrer"
           crossOrigin="anonymous"
           onError={(e) => { e.target.src = '/placeholder-car.jpg'; }}
@@ -49,7 +53,7 @@ export default function CarCard({ car, exchangeRates, onClick }) {
       <div className="p-4">
         {/* Car name */}
         <h3 className="text-lg font-bold text-gray-800 mb-2 truncate group-hover:text-blue-600 transition-colors">
-          {car.carname || `${car.brandname} ${car.seriesname}`}
+          {car.carname || `${displayBrandName} ${car.seriesname}`}
         </h3>
         
         {/* Price - prominent */}

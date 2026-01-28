@@ -6,6 +6,7 @@ import CarDetailModal from './components/CarDetailModal';
 import SortSelector from './components/SortSelector';
 import { fetchCars, fetchAvailableFilters } from './lib/api';
 import brandsList from '../brandname.json';
+import { getDisplayBrandName, getApiBrandName, BRAND_NAME_MAPPING } from './lib/brandMapping';
 import './index.css';
 
 // Default filter values
@@ -113,8 +114,16 @@ export default function App() {
         if (Array.isArray(value) && value.length === 0) return;
         
         if (value !== '' && value != null) {
+          // Convert brand names from display to API format
+          if (key === 'brandname') {
+            if (Array.isArray(value)) {
+              params[key] = value.map(displayName => getApiBrandName(displayName));
+            } else {
+              params[key] = getApiBrandName(value);
+            }
+          }
           // Convert engine volume from liters to milliliters
-          if (key === 'engine_volume_from' || key === 'engine_volume_to') {
+          else if (key === 'engine_volume_from' || key === 'engine_volume_to') {
             params[key] = Math.round(parseFloat(value) * 1000);
           }
           // Convert power from HP to kW (HP / 1.36)
@@ -158,12 +167,18 @@ export default function App() {
   };
 
 
-  // Load brands from local JSON file on mount
+  // Load brands from local JSON file on mount and apply mapping
   useEffect(() => {
     try {
       setLoadingBrands(true);
-      // brandsList.values contains the array of brand names
-      setBrands(brandsList.values || brandsList);
+      // Get API brand names from JSON file
+      const apiBrands = brandsList.values || brandsList;
+      // Map to display names and sort
+      const displayBrands = apiBrands
+        .map(apiBrand => getDisplayBrandName(apiBrand))
+        .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
+        .sort();
+      setBrands(displayBrands);
     } catch (err) {
       console.error('Error loading brands from JSON:', err);
     } finally {
@@ -184,8 +199,10 @@ export default function App() {
       
       try {
         setLoadingModels(true);
+        // Convert display brand names to API format for the request
+        const apiBrands = brands.map(displayName => getApiBrandName(displayName));
         const modelList = await fetchAvailableFilters('seriesname', {
-          brandname: brands
+          brandname: apiBrands
         }, 200);
         setModels(modelList);
       } catch (err) {

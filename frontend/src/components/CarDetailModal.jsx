@@ -3,6 +3,7 @@ import { fetchCarById } from '../lib/api';
 import { calculateFullPrice, formatPriceBreakdown } from '../lib/currency';
 import { translateColor } from '../lib/colorTranslations';
 import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
+import { getDisplayBrandName } from '../lib/brandMapping';
 
 /**
  * Modal component for displaying car details
@@ -110,6 +111,9 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   
   // Translate fuel type to Russian with detailed hybrid categories
   const fuelTypeRu = carDetails?.technical_specs?.fuelname ? apiFuelTypeToDetailedCategory(carDetails.technical_specs.fuelname) : '';
+  
+  // Get display brand name
+  const displayBrandName = getDisplayBrandName(car?.brandname || carDetails?.vehicle_info?.brandname);
 
   return (
     <div 
@@ -154,7 +158,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                   <>
                     <img
                       src={photoUrls[currentPhotoIndex]}
-                      alt={carDetails.vehicle_info?.carname || `${carDetails.vehicle_info?.brandname} ${carDetails.vehicle_info?.seriesname}`}
+                      alt={carDetails.vehicle_info?.carname || `${displayBrandName} ${carDetails.vehicle_info?.seriesname}`}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                       crossOrigin="anonymous"
@@ -286,7 +290,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
               {/* Header */}
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  {carDetails.vehicle_info?.carname || car.carname || `${car.brandname} ${car.seriesname}`}
+                  {carDetails.vehicle_info?.carname || car.carname || `${displayBrandName} ${car.seriesname}`}
                 </h2>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
