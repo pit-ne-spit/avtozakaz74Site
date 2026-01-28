@@ -114,8 +114,7 @@ export async function fetchCars(params = {}) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': API_TOKEN
+      'Accept': 'application/json'
     },
     body: JSON.stringify(requestBody)
   });
@@ -154,8 +153,7 @@ export async function fetchCarById(carId) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': API_TOKEN
+      'Accept': 'application/json'
     },
     body: JSON.stringify({ infoid: carId })
   });
@@ -202,8 +200,7 @@ export async function fetchAvailableFilters(fieldName, filters = {}, limit = 100
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': API_TOKEN
+      'Accept': 'application/json'
     },
     body: JSON.stringify(requestBody)
   });

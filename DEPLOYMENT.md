@@ -132,7 +132,8 @@ docker inspect --format='{{json .State.Health}}' avtozakaz74-frontend
 ## Резервное копирование
 
 Важные файлы для бэкапа:
-- `frontend/src/lib/api.js` - содержит API токен
+- `backend/.env` - **КРИТИЧНО ВАЖНО!** Содержит API токен
+- `docker-compose.yml` - конфигурация сервисов
 - `frontend/brandname.json` - справочник марок
 - `frontend/public/` - статические файлы (логотипы, изображения)
 

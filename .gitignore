@@ -8,6 +8,10 @@ yarn-error.log*
 frontend/dist/
 frontend/build/
 
+# Backend
+backend/node_modules/
+backend/.env
+
 # Environment variables
 .env
 .env.local

@@ -136,14 +136,14 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
         {loading && (
           <div className="flex items-center justify-center h-96">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-700"></div>
           </div>
         )}
 
         {error && (
           <div className="p-8 text-center">
             <p className="text-red-600 text-lg">{error}</p>
-            <button onClick={onClose} className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg">
+            <button onClick={onClose} className="mt-4 px-6 py-2 bg-blue-700 text-white rounded-lg">
               Закрыть
             </button>
           </div>
@@ -212,7 +212,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                           key={actualIndex}
                           onClick={() => setCurrentPhotoIndex(actualIndex)}
                           className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                            actualIndex === currentPhotoIndex ? 'border-blue-600 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
+                            actualIndex === currentPhotoIndex ? 'border-blue-700 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
                           }`}
                         >
                           <img
@@ -294,7 +294,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                 </h2>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
+                    <span className="bg-blue-100 text-blue-900 px-3 py-1 rounded-full font-semibold">
                       {carDetails.vehicle_info?.firstregyear || car.firstregyear}
                     </span>
                     {colorRu && (
@@ -316,7 +316,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                   {breakdown && (
                     <button
                       onClick={() => setShowBreakdown(!showBreakdown)}
-                      className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
+                      className="text-xs text-blue-700 hover:text-blue-800 flex items-center gap-1 font-medium"
                     >
                       <svg className={`w-4 h-4 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -325,7 +325,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                     </button>
                   )}
                 </div>
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-4xl font-extrabold text-green-600">
                   {priceData.totalFormatted}
                 </div>
                 
@@ -376,7 +376,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                 <div className="grid grid-cols-2 gap-4">
                   {(carDetails.vehicle_info?.mileage || car.mileage) && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       <div>
@@ -390,7 +390,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {carDetails.technical_specs?.gearbox && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                       </svg>
                       <div>
@@ -402,7 +402,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {carDetails.vehicle_info?.firstregshortdate && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <div>
@@ -414,7 +414,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {fuelTypeRu && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
                       </svg>
                       <div>
@@ -426,7 +426,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {carDetails.technical_specs?.engine && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       <div>
@@ -438,7 +438,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {carDetails.vehicle_info?.cname && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -451,7 +451,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {carDetails.technical_specs?.drivingmode && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                       <div>
@@ -463,7 +463,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                   {carDetails.technical_specs?.wltc_fuelconsumption && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                       <div>

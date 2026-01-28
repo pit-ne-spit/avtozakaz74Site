@@ -238,7 +238,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <Header />
 
@@ -298,7 +298,7 @@ export default function App() {
         {/* Loading state */}
         {loading && (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
             <p className="text-gray-600 mt-4">Загрузка объявлений...</p>
           </div>
         )}
@@ -308,13 +308,13 @@ export default function App() {
           <>
             <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 flex items-center justify-between hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2">
+                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-2">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <span className="text-gray-700 font-medium">
-                  Найдено <span className="font-bold text-blue-600 text-xl">{total.toLocaleString()}</span> автомобилей
+                  Найдено <span className="font-bold text-blue-700 text-xl">{total.toLocaleString()}</span> автомобилей
                 </span>
               </div>
               <div className="text-sm text-gray-500 font-medium">
