@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchCarById } from '../lib/api';
 import { calculateFullPrice, formatPriceBreakdown } from '../lib/currency';
 import { translateColor } from '../lib/colorTranslations';
+import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
 
 /**
  * Modal component for displaying car details
@@ -75,6 +76,19 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   
   // Translate color from get_car_info API
   const colorRu = carDetails?.vehicle_info?.colorname ? translateColor(carDetails.vehicle_info.colorname) : '';
+  
+  // Format first registration date from YYYY-MM-DD to DD.MM.YYYY
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    }
+    return dateStr;
+  };
+  
+  // Translate fuel type to Russian with detailed hybrid categories
+  const fuelTypeRu = carDetails?.technical_specs?.fuelname ? apiFuelTypeToDetailedCategory(carDetails.technical_specs.fuelname) : '';
 
   return (
     <div 
@@ -294,26 +308,26 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                     </div>
                   )}
 
-                  {carDetails.vehicle_info?.levelname && (
+                  {carDetails.vehicle_info?.firstregshortdate && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <div>
-                        <div className="text-xs text-gray-500">Тип кузова</div>
-                        <div className="font-semibold text-gray-900">{carDetails.vehicle_info.levelname}</div>
+                        <div className="text-xs text-gray-500">Дата первой регистрации</div>
+                        <div className="font-semibold text-gray-900">{formatDate(carDetails.vehicle_info.firstregshortdate)}</div>
                       </div>
                     </div>
                   )}
 
-                  {carDetails.technical_specs?.displacement && (
+                  {fuelTypeRu && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
                       </svg>
                       <div>
-                        <div className="text-xs text-gray-500">Объем двигателя</div>
-                        <div className="font-semibold text-gray-900">{carDetails.technical_specs.displacement}L</div>
+                        <div className="text-xs text-gray-500">Тип топлива</div>
+                        <div className="font-semibold text-gray-900">{fuelTypeRu}</div>
                       </div>
                     </div>
                   )}

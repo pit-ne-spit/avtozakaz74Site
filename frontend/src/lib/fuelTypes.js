@@ -51,3 +51,37 @@ export function apiFuelTypeToCategory(apiFuelType) {
   }
   return apiFuelType; // Return as-is if not found
 }
+
+// Detailed hybrid mapping for individual car cards
+const DETAILED_HYBRID_MAPPING = {
+  'Параллельный гибрид': [
+    'Gas-Electric Hybrid',
+    'Gasoline Electric Drive',
+    'Plug-In Hybrid',  // Относим к параллельным
+  ],
+  'Последовательный гибрид': [
+    'Extended Range'
+  ],
+  'Мягкий гибрид': [
+    'Diesel+48v Light Hybrid System',
+    'Gasoline + 48v Mild Hybrid System',
+    'Gasoline +90v Mild Hybrid System',
+  ]
+};
+
+/**
+ * Convert API fuel type to detailed category (for individual car modal)
+ * @param {string} apiFuelType - API fuel type (e.g., 'Gasoline')
+ * @returns {string} Detailed category
+ */
+export function apiFuelTypeToDetailedCategory(apiFuelType) {
+  // Проверяем детальный маппинг гибридов
+  for (const [category, apiTypes] of Object.entries(DETAILED_HYBRID_MAPPING)) {
+    if (apiTypes.includes(apiFuelType)) {
+      return category;
+    }
+  }
+  
+  // Если не гибрид - используем обычный маппинг
+  return apiFuelTypeToCategory(apiFuelType);
+}
