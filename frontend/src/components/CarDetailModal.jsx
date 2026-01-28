@@ -87,6 +87,15 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
     return dateStr;
   };
   
+  // Format publication date: "today"/"Today" -> "Сегодня", "YYYY-MM-DD" -> "DD.MM.YYYY"
+  const formatPublicDate = (dateStr) => {
+    if (!dateStr) return '';
+    if (dateStr.toLowerCase() === 'today') {
+      return 'Сегодня';
+    }
+    return formatDate(dateStr);
+  };
+  
   // Translate fuel type to Russian with detailed hybrid categories
   const fuelTypeRu = carDetails?.technical_specs?.fuelname ? apiFuelTypeToDetailedCategory(carDetails.technical_specs.fuelname) : '';
 
@@ -198,6 +207,32 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                   ))}
                 </div>
               )}
+
+              {/* Seller's remarks */}
+              {carDetails.history_condition?.remark && (
+                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="text-sm text-amber-700 font-semibold">Примечания продавца</div>
+                        <div className="group relative">
+                          <svg className="w-4 h-4 text-amber-600 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                          </svg>
+                          <div className="absolute left-0 top-6 w-64 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 shadow-lg">
+                            Для перевода выделите текст и нажмите правую кнопку мыши
+                            <div className="absolute -top-1 left-2 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-700 whitespace-pre-line select-text">{carDetails.history_condition.remark}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Car Details */}
@@ -207,12 +242,19 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   {carDetails.vehicle_info?.carname || car.carname || `${car.brandname} ${car.seriesname}`}
                 </h2>
-                <div className="flex items-center gap-3">
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
-                    {carDetails.vehicle_info?.firstregyear || car.firstregyear}
-                  </span>
-                  {colorRu && (
-                    <span className="text-gray-600">• {colorRu}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
+                      {carDetails.vehicle_info?.firstregyear || car.firstregyear}
+                    </span>
+                    {colorRu && (
+                      <span className="text-gray-600">• {colorRu}</span>
+                    )}
+                  </div>
+                  {carDetails.vehicle_info?.publicdate && (
+                    <div className="text-sm text-gray-500">
+                      Опубликовано: <span className="font-medium text-gray-700">{formatPublicDate(carDetails.vehicle_info.publicdate)}</span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -353,6 +395,30 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                       <div>
                         <div className="text-xs text-gray-500">Город</div>
                         <div className="font-semibold text-gray-900">{carDetails.vehicle_info.cname}</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {carDetails.technical_specs?.drivingmode && (
+                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
+                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      <div>
+                        <div className="text-xs text-gray-500">Привод</div>
+                        <div className="font-semibold text-gray-900">{carDetails.technical_specs.drivingmode}</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {carDetails.technical_specs?.wltc_fuelconsumption && (
+                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
+                      <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      <div>
+                        <div className="text-xs text-gray-500">Расход топлива по WLTC</div>
+                        <div className="font-semibold text-gray-900">{carDetails.technical_specs.wltc_fuelconsumption} л/100км</div>
                       </div>
                     </div>
                   )}
