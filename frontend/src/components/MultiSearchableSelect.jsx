@@ -77,7 +77,7 @@ export default function MultiSearchableSelect({
           }
         }}
         disabled={disabled || loading}
-        className={`select w-full flex items-center justify-between gap-2 min-h-[42px] ${
+        className={`select w-full flex items-start justify-between gap-2 min-h-[42px] ${
           disabled || loading ? 'opacity-60 cursor-not-allowed' : ''
         } ${selectedValues.length > 1 ? 'py-1.5' : ''}`}
       >
@@ -116,7 +116,7 @@ export default function MultiSearchableSelect({
         {selectedValues.length > 0 && !disabled && !loading && (
           <svg
             onClick={handleClear}
-            className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

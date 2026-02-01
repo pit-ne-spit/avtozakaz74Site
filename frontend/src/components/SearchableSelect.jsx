@@ -63,11 +63,11 @@ export default function SearchableSelect({
           }
         }}
         disabled={disabled || loading}
-        className={`select w-full flex items-center justify-between gap-2 h-[42px] ${
+        className={`select w-full flex items-center gap-2 h-[42px] ${
           disabled || loading ? 'opacity-60 cursor-not-allowed' : ''
         }`}
       >
-        <span className={value ? 'text-gray-900' : 'text-gray-500'}>
+        <span className={`flex-1 text-left ${value ? 'text-gray-900' : 'text-gray-500'}`}>
           {loading ? 'Загрузка...' : displayText}
         </span>
         {value && !disabled && !loading && (
