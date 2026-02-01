@@ -16,6 +16,11 @@ function transformFiltersToApiFormat(params) {
   
   const apiFilters = {};
   
+  // Transform infoid (for fetching specific car)
+  if (filters.infoid) {
+    apiFilters.infoid = parseInt(filters.infoid);
+  }
+  
   // Transform brandname (array)
   if (filters.brandname) {
     apiFilters.brandname = Array.isArray(filters.brandname) 
