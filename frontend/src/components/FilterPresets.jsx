@@ -69,7 +69,7 @@ export default function FilterPresets({ onApplyPreset }) {
         <span className="text-sm font-semibold text-gray-700">Быстрый выбор:</span>
       </div>
       
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex gap-3 flex-wrap mt-[200px] md:mt-0">
         {presets.map(preset => (
           <button
             key={preset.id}

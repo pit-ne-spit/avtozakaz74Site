@@ -290,7 +290,7 @@ export default function HomePage() {
       </div>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 pt-64 pb-6 space-y-6">
+      <main className="container mx-auto px-4 pt-[36rem] md:pt-64 pb-6 space-y-6">
         {/* Error message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -323,28 +323,32 @@ export default function HomePage() {
         {/* Results count and sorting */}
         {!loading && !error && (
           <>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 flex items-center justify-between hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-2">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-2">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700 font-medium">
+                    Найдено <span className="font-bold text-blue-700 text-xl">{total.toLocaleString()}</span> автомобилей
+                  </span>
                 </div>
-                <span className="text-gray-700 font-medium">
-                  Найдено <span className="font-bold text-blue-700 text-xl">{total.toLocaleString()}</span> автомобилей
-                </span>
+                <div className="text-sm text-gray-500 font-medium">
+                  Страница {page} из {Math.ceil(total / pageSize)}
+                </div>
               </div>
-              <div className="text-sm text-gray-500 font-medium">
-                Страница {page} из {Math.ceil(total / pageSize)}
+              
+              {/* Sort selector - теперь внутри блока результатов */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <SortSelector
+                  sortBy={sortBy}
+                  sortDirection={sortDirection}
+                  onChange={handleSortChange}
+                />
               </div>
             </div>
-            
-            {/* Sort selector */}
-            <SortSelector
-              sortBy={sortBy}
-              sortDirection={sortDirection}
-              onChange={handleSortChange}
-            />
           </>
         )}
 
