@@ -28,9 +28,9 @@ const defaultFilters = {
 const staticOptions = {
   fuelTypes: ['Бензин', 'Дизель', 'Гибрид', 'Электричество'],
   
-  // Year options: 2005-2026
-  yearsFrom: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
-  yearsTo: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
+  // Year options: 2026-2005 (от новых к старым)
+  yearsFrom: Array.from({ length: 22 }, (_, i) => 2026 - i), // 2026-2005
+  yearsTo: Array.from({ length: 22 }, (_, i) => 2026 - i), // 2026-2005
   
   // Price options in rubles
   pricesFrom: [1000000, 1500000, 2000000, 2500000, 3000000],
@@ -290,7 +290,7 @@ export default function HomePage() {
       </div>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 pt-64 pb-6 space-y-6">
+      <main className="container mx-auto px-4 pt-[36rem] md:pt-64 pb-6 space-y-6">
         {/* Error message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -323,28 +323,32 @@ export default function HomePage() {
         {/* Results count and sorting */}
         {!loading && !error && (
           <>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 flex items-center justify-between hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-2">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-2">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700 font-medium">
+                    Найдено <span className="font-bold text-blue-700 text-xl">{total.toLocaleString()}</span> автомобилей
+                  </span>
                 </div>
-                <span className="text-gray-700 font-medium">
-                  Найдено <span className="font-bold text-blue-700 text-xl">{total.toLocaleString()}</span> автомобилей
-                </span>
+                <div className="text-sm text-gray-500 font-medium">
+                  Страница {page} из {Math.ceil(total / pageSize)}
+                </div>
               </div>
-              <div className="text-sm text-gray-500 font-medium">
-                Страница {page} из {Math.ceil(total / pageSize)}
+              
+              {/* Sort selector - теперь внутри блока результатов */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <SortSelector
+                  sortBy={sortBy}
+                  sortDirection={sortDirection}
+                  onChange={handleSortChange}
+                />
               </div>
             </div>
-            
-            {/* Sort selector */}
-            <SortSelector
-              sortBy={sortBy}
-              sortDirection={sortDirection}
-              onChange={handleSortChange}
-            />
           </>
         )}
 
@@ -401,6 +405,11 @@ export default function HomePage() {
               <p className="text-gray-300 text-sm leading-relaxed">
                 Покупаем и доставляем авто из Китая, Японии и Кореи. Работаем напрямую с экспортными компаниями.
               </p>
+              <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                <p className="text-gray-400 text-xs leading-relaxed">
+                  Обращаем ваше внимание на то, что вся информация (включая цены) на сайте носит исключительно информационный характер и ни при каких условиях не является публичной офертой, определяемой положениями Статьи 437 Гражданского кодекса РФ.
+                </p>
+              </div>
             </div>
             <div>
               <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
@@ -452,8 +461,8 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-8 pt-6 text-center">
-            <p className="text-gray-400 text-sm">&copy; 2025 АвтоЗаказ3 74. Все права защищены.</p>
+          <div className="border-t border-gray-700 mt-8 pt-6">
+            <p className="text-gray-400 text-sm text-center">&copy; 2025 АвтоЗаказ 74. Все права защищены.</p>
           </div>
         </div>
       </footer>

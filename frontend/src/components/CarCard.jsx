@@ -25,7 +25,8 @@ export default function CarCard({ car, exchangeRates }) {
       customs_fee_rub: car.customs_fee_rub,
       recycling_fee_rub: car.recycling_fee_rub
     },
-    exchangeRates.EUR
+    exchangeRates.EUR,
+    car // Передаём объект для валидации пошлины
   );
 
   return (
@@ -61,9 +62,9 @@ export default function CarCard({ car, exchangeRates }) {
         
         {/* Price - prominent */}
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg px-4 py-3 mb-3">
-          <div className="text-xs text-gray-600 mb-1">Полная стоимость в России</div>
+          <div className="text-xs text-gray-600 mb-1">Примерная стоимость в России</div>
           <div className="text-3xl font-extrabold text-green-600">
-            {priceData.totalFormatted}
+            ~{priceData.totalFormatted}
           </div>
         </div>
         
