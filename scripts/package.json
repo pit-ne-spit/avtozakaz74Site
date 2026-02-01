@@ -1,0 +1,12 @@
+{
+  "name": "avtozakaz74-scripts",
+  "version": "1.0.0",
+  "description": "Utility scripts for generating reference data",
+  "type": "module",
+  "scripts": {
+    "generate-models": "node generate-models-reference.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

@@ -1,0 +1,492 @@
+[
+  {
+    "brand": "Audi",
+    "original": "Audi A3 (Imported)",
+    "normalized": "Audi A3 (Импорт)"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A4 (Imported)",
+    "normalized": "Audi A4 (Импорт)"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A4l",
+    "normalized": "Audi A4L"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A5 (Imported)",
+    "normalized": "Audi A5 (Импорт)"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A6 (Imported)",
+    "normalized": "Audi A6 (Импорт)"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A6l",
+    "normalized": "Audi A6L"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A6l New Energy",
+    "normalized": "Audi A6L New Energy"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi A7l",
+    "normalized": "Audi A7L"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi E-Tron",
+    "normalized": "Audi E-tron"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q2l",
+    "normalized": "Audi Q2L"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q2l E-Tron",
+    "normalized": "Audi Q2L E-tron"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q3 (Imported)",
+    "normalized": "Audi Q3 (Импорт)"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q4 E-Tron",
+    "normalized": "Audi Q4 E-tron"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q5 (Imported)",
+    "normalized": "Audi Q5 (Импорт)"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q5l",
+    "normalized": "Audi Q5L"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Q5l Sportback",
+    "normalized": "Audi Q5L Sportback"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Rs 3",
+    "normalized": "Audi RS 3"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Rs 4",
+    "normalized": "Audi RS 4"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Rs 5",
+    "normalized": "Audi RS 5"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Rs 6",
+    "normalized": "Audi RS 6"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Rs 7",
+    "normalized": "Audi RS 7"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Rs E-Tron Gt",
+    "normalized": "Audi RS E-tron Gt"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi Tts",
+    "normalized": "Audi TTS"
+  },
+  {
+    "brand": "Audi",
+    "original": "Audi e-tron GT",
+    "normalized": "Audi E-tron GT"
+  },
+  {
+    "brand": "Baic Weiwang",
+    "original": "Baic Weiwang M50f",
+    "normalized": "Baic Weiwang M50F"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw 1 Series (Imported)",
+    "normalized": "Bmw 1 Series (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw 2 Series (Imported)",
+    "normalized": "Bmw 2 Series (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw 2 Series Station Wagon (Imported)",
+    "normalized": "Bmw 2 Series Station Wagon (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw 3 Series (Imported)",
+    "normalized": "Bmw 3 Series (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw 5 Series (Imported)",
+    "normalized": "Bmw 5 Series (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw I3 (Imported)",
+    "normalized": "Bmw I3 (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw I7 M70l",
+    "normalized": "Bmw I7 M70L"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw M240i",
+    "normalized": "Bmw M240I"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw X1 (Imported)",
+    "normalized": "Bmw X1 (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw X2 (Imported)",
+    "normalized": "Bmw X2 (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw X2 M35i",
+    "normalized": "Bmw X2 M35I"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw X3 (Imported)",
+    "normalized": "Bmw X3 (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw X4 M40i",
+    "normalized": "Bmw X4 M40I"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw X5 (Imported)",
+    "normalized": "Bmw X5 (Импорт)"
+  },
+  {
+    "brand": "Bmw",
+    "original": "Bmw Z4 M40i",
+    "normalized": "Bmw Z4 M40I"
+  },
+  {
+    "brand": "Cadillac",
+    "original": "Cadillac Ats (Imported)",
+    "normalized": "Cadillac Ats (Импорт)"
+  },
+  {
+    "brand": "Cadillac",
+    "original": "Cadillac Cts (Imported)",
+    "normalized": "Cadillac Cts (Импорт)"
+  },
+  {
+    "brand": "Changan Auchan",
+    "original": "Changan Auchan X70a",
+    "normalized": "Changan Auchan X70A"
+  },
+  {
+    "brand": "Chrysler",
+    "original": "Chrysler 300c (Imported)",
+    "normalized": "Chrysler 300c (Импорт)"
+  },
+  {
+    "brand": "Chrysler",
+    "original": "Dajielong (Imported)",
+    "normalized": "Dajielong (Импорт)"
+  },
+  {
+    "brand": "Chrysler",
+    "original": "Dajielong Phev (Imported)",
+    "normalized": "Dajielong Phev (Импорт)"
+  },
+  {
+    "brand": "Citroën",
+    "original": "Citroen C4l",
+    "normalized": "Citroen C4L"
+  },
+  {
+    "brand": "Dongfeng Xiaokang",
+    "original": "Dongfeng Xiaokang K05s",
+    "normalized": "Dongfeng Xiaokang K05S"
+  },
+  {
+    "brand": "Dongfeng Xiaokang",
+    "original": "Dongfeng Xiaokang K07s",
+    "normalized": "Dongfeng Xiaokang K07S"
+  },
+  {
+    "brand": "Ford",
+    "original": "Carnival (Imported)",
+    "normalized": "Carnival (Импорт)"
+  },
+  {
+    "brand": "Ford",
+    "original": "Explorer (Imported)",
+    "normalized": "Explorer (Импорт)"
+  },
+  {
+    "brand": "Ford",
+    "original": "Focus (Imported)",
+    "normalized": "Focus (Импорт)"
+  },
+  {
+    "brand": "Ford",
+    "original": "Ranger (Imported)",
+    "normalized": "Ranger (Импорт)"
+  },
+  {
+    "brand": "Ford",
+    "original": "Ruiji (Imported)",
+    "normalized": "Ruiji (Импорт)"
+  },
+  {
+    "brand": "Ford",
+    "original": "Ruijie (Imported)",
+    "normalized": "Ruijie (Импорт)"
+  },
+  {
+    "brand": "Galloping",
+    "original": "Pentium B70s",
+    "normalized": "Pentium B70S"
+  },
+  {
+    "brand": "Golden Cup",
+    "original": "New Hiace X30l",
+    "normalized": "New Hiace X30L"
+  },
+  {
+    "brand": "Harvard",
+    "original": "Haval F7x",
+    "normalized": "Haval F7X"
+  },
+  {
+    "brand": "Harvard",
+    "original": "Haval H2s",
+    "normalized": "Haval H2S"
+  },
+  {
+    "brand": "Harvard",
+    "original": "Haval H6s",
+    "normalized": "Haval H6S"
+  },
+  {
+    "brand": "Honda",
+    "original": "Civic (Imported)",
+    "normalized": "Civic (Импорт)"
+  },
+  {
+    "brand": "Hyundai",
+    "original": "Shengda (Imported)",
+    "normalized": "Shengda (Импорт)"
+  },
+  {
+    "brand": "Infiniti",
+    "original": "Infiniti Q50l",
+    "normalized": "Infiniti Q50L"
+  },
+  {
+    "brand": "Infiniti",
+    "original": "Infiniti Qx50 (Imported)",
+    "normalized": "Infiniti Qx50 (Импорт)"
+  },
+  {
+    "brand": "Infiniti",
+    "original": "Infiniti Qx60 (Imported)",
+    "normalized": "Infiniti Qx60 (Импорт)"
+  },
+  {
+    "brand": "Jeep",
+    "original": "Free Light (Imported)",
+    "normalized": "Free Light (Импорт)"
+  },
+  {
+    "brand": "Jeep",
+    "original": "Grand Cherokee (Imported)",
+    "normalized": "Grand Cherokee (Импорт)"
+  },
+  {
+    "brand": "Jiangling Group New Energy",
+    "original": "Jiangling E200l",
+    "normalized": "Jiangling E200L"
+  },
+  {
+    "brand": "Kia",
+    "original": "Kia K3s",
+    "normalized": "Kia K3S"
+  },
+  {
+    "brand": "Land Rover",
+    "original": "Range Rover Evoque (Imported)",
+    "normalized": "Range Rover Evoque (Импорт)"
+  },
+  {
+    "brand": "Mazda",
+    "original": "Mazda Cx-7 (Imported)",
+    "normalized": "Mazda Cx-7 (Импорт)"
+  },
+  {
+    "brand": "Mazda",
+    "original": "Mazda3 (Imported)",
+    "normalized": "Mazda3 (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Mercedes-Benz A-Class (Imported)",
+    "normalized": "Mercedes-Benz A-Class (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Mercedes-Benz A-Class Amg (Imported)",
+    "normalized": "Mercedes-Benz A-Class Amg (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Mercedes-Benz C-Class (Imported)",
+    "normalized": "Mercedes-Benz C-Class (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Mercedes-Benz Cla (Imported)",
+    "normalized": "Mercedes-Benz Cla (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Mercedes-Benz E-Class (Imported)",
+    "normalized": "Mercedes-Benz E-Class (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Mercedes-Benz Glk-Class (Imported)",
+    "normalized": "Mercedes-Benz Glk-Class (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Viano (Imported)",
+    "normalized": "Viano (Импорт)"
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "original": "Vito (Imported)",
+    "normalized": "Vito (Импорт)"
+  },
+  {
+    "brand": "Mitsubishi",
+    "original": "Outlander (Imported)",
+    "normalized": "Outlander (Импорт)"
+  },
+  {
+    "brand": "Mitsubishi",
+    "original": "Pajero (Imported)",
+    "normalized": "Pajero (Импорт)"
+  },
+  {
+    "brand": "Mitsubishi",
+    "original": "Pajero Jinchang (imported)",
+    "normalized": "Pajero Jinchang (Импорт)"
+  },
+  {
+    "brand": "Peugeot",
+    "original": "Peugeot 307 (Imported)",
+    "normalized": "Peugeot 307 (Импорт)"
+  },
+  {
+    "brand": "Peugeot",
+    "original": "Peugeot 308 (Imported)",
+    "normalized": "Peugeot 308 (Импорт)"
+  },
+  {
+    "brand": "Qichen",
+    "original": "Venucia M50v",
+    "normalized": "Venucia M50V"
+  },
+  {
+    "brand": "Qichen",
+    "original": "Venucia R50x",
+    "normalized": "Venucia R50X"
+  },
+  {
+    "brand": "Renault",
+    "original": "Koleos (Imported)",
+    "normalized": "Koleos (Импорт)"
+  },
+  {
+    "brand": "Roewe",
+    "original": "Roewe D5x Dmh",
+    "normalized": "Roewe D5X Dmh"
+  },
+  {
+    "brand": "Suzuki",
+    "original": "Jimny (Imported)",
+    "normalized": "Jimny (Импорт)"
+  },
+  {
+    "brand": "Toyota",
+    "original": "Crown (Imported)",
+    "normalized": "Crown (Импорт)"
+  },
+  {
+    "brand": "Toyota",
+    "original": "Land Cruiser (Imported)",
+    "normalized": "Land Cruiser (Импорт)"
+  },
+  {
+    "brand": "Toyota",
+    "original": "Prado (Imported)",
+    "normalized": "Prado (Импорт)"
+  },
+  {
+    "brand": "Volkswagen",
+    "original": "Golf (Imported)",
+    "normalized": "Golf (Импорт)"
+  },
+  {
+    "brand": "Volkswagen",
+    "original": "Magotan (Imported)",
+    "normalized": "Magotan (Импорт)"
+  },
+  {
+    "brand": "Volvo",
+    "original": "Volvo S60 (Imported)",
+    "normalized": "Volvo S60 (Импорт)"
+  },
+  {
+    "brand": "Volvo",
+    "original": "Volvo S80l",
+    "normalized": "Volvo S80L"
+  },
+  {
+    "brand": "Volvo",
+    "original": "Volvo Xc60 (Imported)",
+    "normalized": "Volvo Xc60 (Импорт)"
+  }
+]
