@@ -78,6 +78,8 @@ avtozakaz74Site/
 │   │   ├── logo_text.png       # Логотип (текст)
 │   │   └── background.jpg      # Фоновое изображение hero секции
 │   ├── brandname.json       # Справочник марок автомобилей
+│   ├── models-reference.json # Справочник моделей (1526 моделей, 183 марки)
+│   ├── models-normalization-changes.json # Отчёт о нормализации названий
 │   ├── color_translations.json # Справочник цветов (китайский → английский)
 │   ├── index.html           # HTML шаблон
 │   ├── package.json         # Зависимости npm
@@ -89,6 +91,11 @@ avtozakaz74Site/
 │   └── .dockerignore        # Исключения для Docker
 ├── docker-compose.yml       # Docker Compose конфигурация
 ├── .dockerignore            # Исключения для Docker
+├── scripts/                 # Утилиты для генерации справочников
+│   ├── generate-models-reference.js # Генерация справочника моделей
+│   ├── normalize-models.js          # Нормализация названий моделей
+│   ├── package.json                 # Зависимости скриптов
+│   └── README.md                    # Документация скриптов
 ├── api_specification.json   # OpenAPI спецификация
 ├── PROJECT_CONTEXT.md       # Контекст проекта
 ├── README.md                # Основная документация
@@ -106,7 +113,7 @@ avtozakaz74Site/
 ### Основные возможности:
 1. **Поиск автомобилей** с фильтрацией по:
    - Марка (brandname) - множественный выбор с поиском (из локального brandname.json)
-   - Модель (seriesname) - searchable select с поиском, загрузка по выбранным маркам
+   - Модель (seriesname) - searchable select с поиском (из локального models-reference.json)
    - Год выпуска (year_from/year_to) - числовой ввод с предустановками 2005-2026
    - Цена в рублях (total_price_rub_min/max) - с предустановками и форматированием
    - Пробег (mileage_from/to) - с предустановками и форматированием
@@ -161,7 +168,9 @@ avtozakaz74Site/
   * Мощность: лошадиные силы → киловатты (деление на 1.36)
   * Текстовые фильтры в массивы
   * Диапазоны в формат [min, max]
-- Динамическая загрузка списков марок и моделей через /getAvailableFilters
+- Локальные справочники марок (brandname.json) и моделей (models-reference.json)
+- Мгновенная загрузка фильтров без запросов к API
+- Нормализованные названия моделей (A4L, RS 3, (Импорт))
 - Обработка ответов с курсами валют (CNY и EUR)
 - Обработка ошибок и состояний загрузки
 

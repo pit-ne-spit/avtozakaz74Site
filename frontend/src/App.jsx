@@ -5,8 +5,9 @@ import CarCard from './components/CarCard';
 import Pagination from './components/Pagination';
 import CarDetailModal from './components/CarDetailModal';
 import SortSelector from './components/SortSelector';
-import { fetchCars, fetchAvailableFilters } from './lib/api';
+import { fetchCars } from './lib/api';
 import brandsList from '../brandname.json';
+import modelsReference from '../models-reference.json';
 import { getDisplayBrandName, getApiBrandName, BRAND_NAME_MAPPING } from './lib/brandMapping';
 import './index.css';
 
@@ -187,33 +188,34 @@ export default function App() {
     }
   }, []);
   
-  // Load models when brand changes
+  // Load models when brand changes (from local reference)
   useEffect(() => {
-    const loadModels = async () => {
-      const brandValue = filters.brandname;
-      const brands = Array.isArray(brandValue) ? brandValue : (brandValue ? [brandValue] : []);
-      
-      if (brands.length === 0) {
-        setModels([]);
-        return;
-      }
-      
-      try {
-        setLoadingModels(true);
-        // Convert display brand names to API format for the request
-        const apiBrands = brands.map(displayName => getApiBrandName(displayName));
-        const modelList = await fetchAvailableFilters('seriesname', {
-          brandname: apiBrands
-        }, 200);
-        setModels(modelList);
-      } catch (err) {
-        console.error('Error loading models:', err);
-      } finally {
-        setLoadingModels(false);
-      }
-    };
+    const brandValue = filters.brandname;
+    const brands = Array.isArray(brandValue) ? brandValue : (brandValue ? [brandValue] : []);
     
-    loadModels();
+    if (brands.length === 0) {
+      setModels([]);
+      return;
+    }
+    
+    setLoadingModels(true);
+    
+    // Get models from local reference for selected brands
+    const allModels = new Set();
+    
+    brands.forEach(displayBrand => {
+      // Convert display brand to API brand name
+      const apiBrand = getApiBrandName(displayBrand);
+      
+      // Get models for this brand from reference
+      const brandModels = modelsReference[apiBrand] || [];
+      brandModels.forEach(model => allModels.add(model));
+    });
+    
+    // Convert to sorted array
+    const modelList = Array.from(allModels).sort();
+    setModels(modelList);
+    setLoadingModels(false);
   }, [filters.brandname]);
   
   // Load initial data
