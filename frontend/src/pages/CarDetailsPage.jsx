@@ -91,7 +91,8 @@ export default function CarDetailsPage() {
       customs_fee_rub: car.customs_fee_rub,
       recycling_fee_rub: car.recycling_fee_rub
     },
-    exchangeRates.EUR
+    exchangeRates.EUR,
+    car // Передаём объект для валидации пошлины
   ) : { totalFormatted: 'Загрузка...', breakdown: null };
   const breakdown = priceData.breakdown ? formatPriceBreakdown(priceData.breakdown) : null;
   

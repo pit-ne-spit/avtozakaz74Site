@@ -3,6 +3,8 @@
  * Calculates full price with all fees according to business logic
  */
 
+import { validateAndRecalculateImportDuty } from './customsDuty';
+
 /**
  * Calculate full price with all fees
  * 
@@ -19,9 +21,10 @@
  * @param {number} exchangeRateCny - CNY to RUB exchange rate
  * @param {object} fees - Object with import_duty (EUR), customs_fee_rub, recycling_fee_rub
  * @param {number} exchangeRateEur - EUR to RUB exchange rate
+ * @param {object} car - Full car object for validation (optional)
  * @returns {object} Formatted price data with breakdown
  */
-export function calculateFullPrice(priceCny, exchangeRateCny, fees = {}, exchangeRateEur = 0) {
+export function calculateFullPrice(priceCny, exchangeRateCny, fees = {}, exchangeRateEur = 0, car = null) {
   if (!priceCny || !exchangeRateCny) {
     return {
       total: null,
@@ -30,9 +33,22 @@ export function calculateFullPrice(priceCny, exchangeRateCny, fees = {}, exchang
     };
   }
 
+  // Валидация и пересчёт таможенной пошлины
+  let importDutyEur = fees.import_duty || 0;
+  let dutyRecalculated = false;
+  
+  if (car && car.firstregshortdate && car.engine_volume_ml) {
+    const validation = validateAndRecalculateImportDuty(car, {
+      CNY: exchangeRateCny,
+      EUR: exchangeRateEur
+    });
+    
+    importDutyEur = validation.import_duty_eur;
+    dutyRecalculated = validation.recalculated;
+  }
+  
   // Расчёт составляющих
   const priceInRub = priceCny * exchangeRateCny;
-  const importDutyEur = fees.import_duty || 0;
   const importDutyRub = importDutyEur * exchangeRateEur; // Конвертация EUR → RUB
   const customsFee = fees.customs_fee_rub || 0;
   const recyclingFee = fees.recycling_fee_rub || 0;

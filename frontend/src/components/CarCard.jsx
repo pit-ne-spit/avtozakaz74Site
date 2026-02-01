@@ -25,7 +25,8 @@ export default function CarCard({ car, exchangeRates }) {
       customs_fee_rub: car.customs_fee_rub,
       recycling_fee_rub: car.recycling_fee_rub
     },
-    exchangeRates.EUR
+    exchangeRates.EUR,
+    car // Передаём объект для валидации пошлины
   );
 
   return (
