@@ -209,7 +209,7 @@ export const BRAND_NAME_MAPPING = {
   'Rolls Royce': 'Rolls-Royce',
   'Saab': 'Saab',
   'Seat': 'SEAT',
-  'Skoda': 'Škoda',
+  'Skoda': 'Skoda',
   'Smart': 'Smart',
   'Ssangyong': 'SsangYong',
   'Subaru': 'Subaru',
