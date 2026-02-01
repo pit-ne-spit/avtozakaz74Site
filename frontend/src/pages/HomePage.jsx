@@ -28,9 +28,9 @@ const defaultFilters = {
 const staticOptions = {
   fuelTypes: ['Бензин', 'Дизель', 'Гибрид', 'Электричество'],
   
-  // Year options: 2005-2026
-  yearsFrom: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
-  yearsTo: Array.from({ length: 22 }, (_, i) => 2026 - i).reverse(), // 2005-2026
+  // Year options: 2026-2005 (от новых к старым)
+  yearsFrom: Array.from({ length: 22 }, (_, i) => 2026 - i), // 2026-2005
+  yearsTo: Array.from({ length: 22 }, (_, i) => 2026 - i), // 2026-2005
   
   // Price options in rubles
   pricesFrom: [1000000, 1500000, 2000000, 2500000, 3000000],
