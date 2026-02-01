@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { fetchCarById } from '../lib/api';
+import { useParams, useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import { fetchCars, fetchCarById } from '../lib/api';
 import { calculateFullPrice, formatPriceBreakdown } from '../lib/currency';
 import { translateColor } from '../lib/colorTranslations';
 import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName } from '../lib/brandMapping';
 
-/**
- * Modal component for displaying car details
- * @param {Object} car - Car object from search_car API (contains pricing info)
- * @param {Object} exchangeRates - Exchange rates (CNY and EUR)
- * @param {Function} onClose - Close modal callback
- */
-export default function CarDetailModal({ car, exchangeRates, onClose }) {
+export default function CarDetailsPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [car, setCar] = useState(null);
   const [carDetails, setCarDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,40 +18,50 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [thumbnailPage, setThumbnailPage] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [exchangeRates, setExchangeRates] = useState({ CNY: null, EUR: null });
 
   useEffect(() => {
-    const loadCarDetails = async () => {
+    const loadCar = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchCarById(car.infoid);
-        setCarDetails(data);
+        
+        // First, fetch basic car info with pricing from search_car API
+        const searchData = await fetchCars({ infoid: id, limit: 1 });
+        if (!searchData.cars || searchData.cars.length === 0) {
+          throw new Error('Автомобиль не найден');
+        }
+        
+        const carData = searchData.cars[0];
+        setCar(carData);
+        
+        // Update exchange rates
+        if (searchData.rates) {
+          setExchangeRates({
+            CNY: searchData.rates.CNY || null,
+            EUR: searchData.rates.EUR || null
+          });
+        }
+        
+        // Then fetch detailed info from get_car_info API
+        const details = await fetchCarById(id);
+        setCarDetails(details);
+        
       } catch (err) {
-        console.error('Error loading car details:', err);
-        setError(err.message);
+        console.error('Error loading car:', err);
+        setError(err.message || 'Ошибка при загрузке данных');
       } finally {
         setLoading(false);
       }
     };
 
-    if (car && car.infoid) {
-      loadCarDetails();
+    if (id) {
+      loadCar();
     }
-  }, [car]);
-
-  // Close modal on Escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+  }, [id]);
 
   // Parse photos from get_car_info API
   const photos = carDetails?.media_support?.photos || [];
-
-  // Photos already have full URLs
   const photoUrls = photos;
 
   const nextPhoto = () => {
@@ -74,7 +83,6 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   };
 
   // Calculate full price using financial data from search_car
-  // car object contains: price_cny, import_duty, customs_fee_rub, recycling_fee_rub
   const priceData = car ? calculateFullPrice(
     car.price_cny, 
     exchangeRates.CNY,
@@ -115,42 +123,68 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
   // Get display brand name
   const displayBrandName = getDisplayBrandName(car?.brandname || carDetails?.vehicle_info?.brandname);
 
-  return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div 
-        className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
-        >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {loading && (
-          <div className="flex items-center justify-center h-96">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-700"></div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header />
+        <div className="flex items-center justify-center h-96 mt-20">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-blue-700"></div>
+            <p className="text-gray-600 mt-4 text-lg">Загрузка информации об автомобиле...</p>
           </div>
-        )}
+        </div>
+      </div>
+    );
+  }
 
-        {error && (
-          <div className="p-8 text-center">
-            <p className="text-red-600 text-lg">{error}</p>
-            <button onClick={onClose} className="mt-4 px-6 py-2 bg-blue-700 text-white rounded-lg">
-              Закрыть
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header />
+        <div className="container mx-auto px-4 py-12 mt-20">
+          <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+            <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Ошибка</h2>
+            <p className="text-red-600 mb-6">{error}</p>
+            <button 
+              onClick={() => navigate(-1)}
+              className="px-6 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+            >
+              Вернуться назад
             </button>
           </div>
-        )}
+        </div>
+      </div>
+    );
+  }
 
-        {carDetails && !loading && !error && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+  if (!car || !carDetails) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Header />
+
+      {/* Back button */}
+      <div className="container mx-auto px-4 pt-24 pb-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-gray-700 hover:text-blue-700 transition-colors font-medium"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Назад к результатам
+        </button>
+      </div>
+
+      {/* Main content */}
+      <main className="container mx-auto px-4 pb-12">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
             {/* Photo Gallery */}
             <div className="space-y-4">
               <div className="relative bg-gray-100 rounded-xl overflow-hidden aspect-[4/3] cursor-zoom-in" onClick={() => setIsFullscreen(true)}>
@@ -169,7 +203,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
                       <>
                         {/* Previous button */}
                         <button
-                          onClick={prevPhoto}
+                          onClick={(e) => { e.stopPropagation(); prevPhoto(); }}
                           className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +213,7 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
 
                         {/* Next button */}
                         <button
-                          onClick={nextPhoto}
+                          onClick={(e) => { e.stopPropagation(); nextPhoto(); }}
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,9 +323,9 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
             <div className="space-y-6">
               {/* Header */}
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   {carDetails.vehicle_info?.carname || car.carname || `${displayBrandName} ${car.seriesname}`}
-                </h2>
+                </h1>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="bg-blue-100 text-blue-900 px-3 py-1 rounded-full font-semibold">
@@ -484,8 +518,8 @@ export default function CarDetailModal({ car, exchangeRates, onClose }) {
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </main>
 
       {/* Fullscreen photo viewer */}
       {isFullscreen && photoUrls.length > 0 && (

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { calculateFullPrice } from '../lib/currency';
 import { apiFuelTypeToCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName } from '../lib/brandMapping';
@@ -5,7 +6,7 @@ import { getDisplayBrandName } from '../lib/brandMapping';
 /**
  * Car card component - displays single car listing
  */
-export default function CarCard({ car, exchangeRates, onClick }) {
+export default function CarCard({ car, exchangeRates }) {
   // Get image URL (single image from API)
   let imageUrl = car.imageurl || '/placeholder-car.jpg';
   if (imageUrl && imageUrl.startsWith('//')) {
@@ -28,9 +29,11 @@ export default function CarCard({ car, exchangeRates, onClick }) {
   );
 
   return (
-    <div 
-      className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:-translate-y-1"
-      onClick={onClick}
+    <Link
+      to={`/car/${car.infoid}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-1"
     >
       {/* Image with overlay badge */}
       <div className="relative overflow-hidden">
@@ -101,10 +104,10 @@ export default function CarCard({ car, exchangeRates, onClick }) {
         </div>
 
         {/* View button */}
-        <button className="w-full mt-4 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
+        <div className="w-full mt-4 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-center">
           Подробнее →
-        </button>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

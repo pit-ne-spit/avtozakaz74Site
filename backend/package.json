@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch-path=. --watch-preserve-output server.js"
   },
   "keywords": [
     "proxy",
