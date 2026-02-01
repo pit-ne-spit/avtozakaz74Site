@@ -93,12 +93,6 @@ export default function CarDetailsPage() {
     },
     exchangeRates.EUR
   ) : { totalFormatted: 'Загрузка...', breakdown: null };
-  
-  // Debug: log price calculation
-  console.log('CarDetailsPage - ID:', id);
-  console.log('CarDetailsPage - car.price_cny:', car?.price_cny);
-  console.log('CarDetailsPage - car.import_duty:', car?.import_duty);
-  console.log('CarDetailsPage - priceData.totalFormatted:', priceData.totalFormatted);
   const breakdown = priceData.breakdown ? formatPriceBreakdown(priceData.breakdown) : null;
   
   // Translate color from get_car_info API
