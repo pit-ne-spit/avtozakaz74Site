@@ -32,38 +32,54 @@ function log(message, level = 'INFO') {
 }
 
 /**
- * Получить все бренды из API
+ * Получить все бренды из API с pagination
  */
 async function fetchBrands() {
   log('Получение списка брендов...');
   
-  try {
-    const response = await fetch(`${API_URL}/getAvailableFilters`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': API_TOKEN
-      },
-      body: JSON.stringify({
-        fields_to_extract: 'brandname',
-        limit: 200,
-        offset: 0
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+  let allBrands = [];
+  let offset = 0;
+  let hasMore = true;
+  
+  while (hasMore) {
+    try {
+      const response = await fetch(`${API_URL}/getAvailableFilters`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': API_TOKEN
+        },
+        body: JSON.stringify({
+          fields_to_extract: 'brandname',
+          limit: LIMIT,
+          offset: offset
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const brands = data.data?.data?.values || [];
+      allBrands.push(...brands);
+      
+      log(`✓ Получено брендов (offset ${offset}): ${brands.length}`);
+      
+      if (brands.length < LIMIT) {
+        hasMore = false;
+      } else {
+        offset += LIMIT;
+        await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+      }
+    } catch (error) {
+      log(`Ошибка получения брендов: ${error.message}`, 'ERROR');
+      throw error;
     }
-    
-    const data = await response.json();
-    const brands = data.data?.data?.values || [];
-    
-    log(`✓ Получено брендов: ${brands.length}`);
-    return brands;
-  } catch (error) {
-    log(`Ошибка получения брендов: ${error.message}`, 'ERROR');
-    throw error;
   }
+  
+  log(`✓ Всего брендов: ${allBrands.length}`);
+  return allBrands;
 }
 
 /**
@@ -225,13 +241,18 @@ async function generateReferences() {
   }
 }
 
-// Запуск (если запущен напрямую)
-generateReferences()
-  .then(() => process.exit(0))
-  .catch(error => {
-    log(`Скрипт завершён с ошибкой: ${error.message}`, 'ERROR');
-    console.error(error);
-    process.exit(1);
-  });
+// Запуск только если запущен напрямую (не через import)
+if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}`) {
+  generateReferences()
+    .then(() => {
+      log('Скрипт завершён успешно');
+      process.exit(0);
+    })
+    .catch(error => {
+      log(`Скрипт завершён с ошибкой: ${error.message}`, 'ERROR');
+      console.error(error);
+      process.exit(1);
+    });
+}
 
 export { generateReferences };
