@@ -6,8 +6,6 @@ import Pagination from './components/Pagination';
 import CarDetailModal from './components/CarDetailModal';
 import SortSelector from './components/SortSelector';
 import { fetchCars } from './lib/api';
-import brandsList from '../brandname.json';
-import modelsReference from '../models-reference.json';
 import { getDisplayBrandName, getApiBrandName, BRAND_NAME_MAPPING } from './lib/brandMapping';
 import './index.css';
 
@@ -89,6 +87,7 @@ export default function App() {
   // Dynamic filter options
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState([]);
+  const [modelsReference, setModelsReference] = useState({});
   const [loadingBrands, setLoadingBrands] = useState(false);
   const [loadingModels, setLoadingModels] = useState(false);
 
@@ -169,26 +168,42 @@ export default function App() {
   };
 
 
-  // Load brands from local JSON file on mount and apply mapping
+  // Load brands and models from backend API on mount
   useEffect(() => {
-    try {
-      setLoadingBrands(true);
-      // Get API brand names from JSON file
-      const apiBrands = brandsList.values || brandsList;
-      // Map to display names and sort
-      const displayBrands = apiBrands
-        .map(apiBrand => getDisplayBrandName(apiBrand))
-        .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
-        .sort();
-      setBrands(displayBrands);
-    } catch (err) {
-      console.error('Error loading brands from JSON:', err);
-    } finally {
-      setLoadingBrands(false);
-    }
+    const loadReferences = async () => {
+      try {
+        setLoadingBrands(true);
+        
+        // Load brands
+        const brandsResponse = await fetch('/api/brands');
+        if (!brandsResponse.ok) throw new Error('Failed to load brands');
+        const brandsData = await brandsResponse.json();
+        
+        const apiBrands = brandsData.values || brandsData;
+        const displayBrands = apiBrands
+          .map(apiBrand => getDisplayBrandName(apiBrand))
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .sort();
+        setBrands(displayBrands);
+        
+        // Load models reference
+        const modelsResponse = await fetch('/api/models');
+        if (!modelsResponse.ok) throw new Error('Failed to load models');
+        const modelsData = await modelsResponse.json();
+        setModelsReference(modelsData);
+        
+      } catch (err) {
+        console.error('Error loading references from backend:', err);
+        // Fallback: можно показать ошибку пользователю
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+    
+    loadReferences();
   }, []);
   
-  // Load models when brand changes (from local reference)
+  // Load models when brand changes (from backend reference)
   useEffect(() => {
     const brandValue = filters.brandname;
     const brands = Array.isArray(brandValue) ? brandValue : (brandValue ? [brandValue] : []);
@@ -198,9 +213,14 @@ export default function App() {
       return;
     }
     
+    // Дождаться загрузки справочника моделей
+    if (Object.keys(modelsReference).length === 0) {
+      return;
+    }
+    
     setLoadingModels(true);
     
-    // Get models from local reference for selected brands
+    // Get models from backend reference for selected brands
     const allModels = new Set();
     
     brands.forEach(displayBrand => {
@@ -216,7 +236,7 @@ export default function App() {
     const modelList = Array.from(allModels).sort();
     setModels(modelList);
     setLoadingModels(false);
-  }, [filters.brandname]);
+  }, [filters.brandname, modelsReference]);
   
   // Load initial data
   useEffect(() => {
