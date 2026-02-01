@@ -1,0 +1,14 @@
+{
+  "filters": {
+    "brandname": ["Mini"],
+    "firstregyear": [2021, 2023]
+  },
+  "pagination": {
+    "limit": 100,
+    "offset": 400
+  },
+  "sorting": {
+    "sort_by": "infoid",
+    "sort_direction": "DESC"
+  }
+}
