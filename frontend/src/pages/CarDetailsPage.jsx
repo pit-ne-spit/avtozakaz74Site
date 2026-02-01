@@ -348,7 +348,7 @@ export default function CarDetailsPage() {
               {/* Price with breakdown */}
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-sm text-gray-600">Полная стоимость в России</div>
+                  <div className="text-sm text-gray-600">Примерная стоимость в России</div>
                   {breakdown && (
                     <button
                       onClick={() => setShowBreakdown(!showBreakdown)}
@@ -362,7 +362,7 @@ export default function CarDetailsPage() {
                   )}
                 </div>
                 <div className="text-4xl font-extrabold text-green-600">
-                  {priceData.totalFormatted}
+                  ~{priceData.totalFormatted}
                 </div>
                 
                 {/* Detailed breakdown */}
@@ -390,6 +390,7 @@ export default function CarDetailsPage() {
                             'text-gray-700'
                           }`}>
                             {step.value}
+                            {step.hasAsterisk && <sup className="text-xs">*</sup>}
                           </div>
                           {step.subValue && (
                             <div className="text-xs text-gray-500 mt-0.5">{step.subValue}</div>
@@ -398,8 +399,11 @@ export default function CarDetailsPage() {
                       </div>
                     ))}
                     <div className="text-xs text-gray-500 mt-3 pt-3 border-t border-green-200 space-y-1">
-                      <div>* Курс CNY: 1 ¥ = {breakdown.rateCny.toFixed(2)} ₽</div>
-                      <div>* Курс EUR: 1 € = {breakdown.rateEur.toFixed(2)} ₽</div>
+                      <div>Курс CNY: 1 ¥ = {breakdown.rateCny.toFixed(2)} ₽</div>
+                      <div>Курс EUR: 1 € = {breakdown.rateEur.toFixed(2)} ₽</div>
+                      <div className="mt-3 pt-3 border-t border-green-200 italic text-gray-600">
+                        *Цена является ориентировочной и зависит от курсов валюты, точной даты выпуска и иных факторов. Цена не является публичной офертой.
+                      </div>
                     </div>
                   </div>
                 )}

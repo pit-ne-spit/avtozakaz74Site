@@ -125,9 +125,10 @@ export function formatPriceBreakdown(breakdown) {
         value: `${fmt(breakdown.commission)} ₽`
       },
       {
-        label: 'ПОЛНАЯ СТОИМОСТЬ В РОССИИ',
+        label: 'ОРИЕНТИРОВОЧНАЯ СТОИМОСТЬ В РОССИИ',
         value: `${fmt(breakdown.totalRub)} ₽`,
-        isTotal: true
+        isTotal: true,
+        hasAsterisk: true
       }
     ],
     rateCny: breakdown.rateCny,

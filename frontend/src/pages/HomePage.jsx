@@ -405,6 +405,11 @@ export default function HomePage() {
               <p className="text-gray-300 text-sm leading-relaxed">
                 Покупаем и доставляем авто из Китая, Японии и Кореи. Работаем напрямую с экспортными компаниями.
               </p>
+              <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                <p className="text-gray-400 text-xs leading-relaxed">
+                  Обращаем ваше внимание на то, что вся информация (включая цены) на сайте носит исключительно информационный характер и ни при каких условиях не является публичной офертой, определяемой положениями Статьи 437 Гражданского кодекса РФ.
+                </p>
+              </div>
             </div>
             <div>
               <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
@@ -456,8 +461,8 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-8 pt-6 text-center">
-            <p className="text-gray-400 text-sm">&copy; 2025 АвтоЗаказ3 74. Все права защищены.</p>
+          <div className="border-t border-gray-700 mt-8 pt-6">
+            <p className="text-gray-400 text-sm text-center">&copy; 2025 АвтоЗаказ 74. Все права защищены.</p>
           </div>
         </div>
       </footer>
