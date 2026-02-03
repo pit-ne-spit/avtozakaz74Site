@@ -13,9 +13,10 @@ import { validateAndRecalculateImportDuty } from './customsDuty';
  * - Единая ставка налога = import_duty_eur * rate_EUR (конвертация из EUR в RUB)
  * - Таможенное оформление = customs_fee_rub
  * - Утилизационный сбор = recycling_fee_rub
- * - Услуги подбора и доставки по Китаю = 15000 * rate_CNY
- * - Услуги таможенного брокера и лаборатория = 75 000 руб
- * - Комиссия Автозаказ 74 = 150 000 руб
+ * - Импорт из Китая в Россию = 15000 * rate_CNY
+ * - Оформление = 75 000 руб
+ * - Комиссия компании = 100 000 руб
+ * - Доставка Челябинск/Москва = 200 000 руб
  * 
  * @param {number} priceCny - Price in CNY from API
  * @param {number} exchangeRateCny - CNY to RUB exchange rate
@@ -54,10 +55,11 @@ export function calculateFullPrice(priceCny, exchangeRateCny, fees = {}, exchang
   const recyclingFee = fees.recycling_fee_rub || 0;
   const chinaServices = 15000 * exchangeRateCny;
   const brokerServices = 75000;
-  const commission = 150000;
+  const commission = 100000;
+  const deliveryFee = 200000;
   
   // Итоговая стоимость
-  const totalRub = priceInRub + importDutyRub + customsFee + recyclingFee + chinaServices + brokerServices + commission;
+  const totalRub = priceInRub + importDutyRub + customsFee + recyclingFee + chinaServices + brokerServices + commission + deliveryFee;
   const totalFormatted = `${(totalRub / 1000000).toFixed(2)} млн ₽`;
   
   return {
@@ -73,6 +75,7 @@ export function calculateFullPrice(priceCny, exchangeRateCny, fees = {}, exchang
       chinaServices: chinaServices,
       brokerServices: brokerServices,
       commission: commission,
+      deliveryFee: deliveryFee,
       totalRub: totalRub,
       rateCny: exchangeRateCny,
       rateEur: exchangeRateEur
@@ -91,6 +94,9 @@ export function formatPriceBreakdown(breakdown) {
   const fmt = (num) => new Intl.NumberFormat('ru-RU').format(Math.round(num));
   const fmtCny = (num) => new Intl.NumberFormat('ru-RU').format(Math.round(num));
   
+  // Сумма таможенных платежей
+  const customsTotal = breakdown.importDutyRub + breakdown.customsFee;
+  
   return {
     steps: [
       {
@@ -99,30 +105,33 @@ export function formatPriceBreakdown(breakdown) {
         subValue: `¥${fmtCny(breakdown.priceCny)}`
       },
       {
-        label: 'Единая ставка налога',
-        value: `${fmt(breakdown.importDutyRub)} ₽`,
-        subValue: `€${fmtCny(breakdown.importDutyEur)}`
-      },
-      {
-        label: 'Таможенное оформление',
-        value: `${fmt(breakdown.customsFee)} ₽`
+        label: 'Таможенные платежи',
+        value: `${fmt(customsTotal)} ₽`,
+        subValues: [
+          `Единая ставка налога: ${fmt(breakdown.importDutyRub)} ₽`,
+          `Таможенное оформление: ${fmt(breakdown.customsFee)} ₽`
+        ]
       },
       {
         label: 'Утилизационный сбор',
         value: `${fmt(breakdown.recyclingFee)} ₽`
       },
       {
-        label: 'Услуги подбора и доставки по Китаю',
+        label: 'Импорт из Китая в Россию',
         value: `${fmt(breakdown.chinaServices)} ₽`,
         subValue: `¥15 000`
       },
       {
-        label: 'Услуги таможенного брокера и лаборатория',
+        label: 'Оформление',
         value: `${fmt(breakdown.brokerServices)} ₽`
       },
       {
-        label: 'Комиссия Автозаказ74',
+        label: 'Комиссия компании',
         value: `${fmt(breakdown.commission)} ₽`
+      },
+      {
+        label: 'Доставка Челябинск/Москва',
+        value: `${fmt(breakdown.deliveryFee)} ₽`
       },
       {
         label: 'ОРИЕНТИРОВОЧНАЯ СТОИМОСТЬ В РОССИИ',
