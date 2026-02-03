@@ -392,7 +392,13 @@ export default function CarDetailsPage() {
                             {step.value}
                             {step.hasAsterisk && <sup className="text-xs">*</sup>}
                           </div>
-                          {step.subValue && (
+                          {step.subValues && Array.isArray(step.subValues) ? (
+                            <div className="text-xs text-gray-500 mt-0.5 space-y-0.5">
+                              {step.subValues.map((subVal, subIdx) => (
+                                <div key={subIdx}>{subVal}</div>
+                              ))}
+                            </div>
+                          ) : step.subValue && (
                             <div className="text-xs text-gray-500 mt-0.5">{step.subValue}</div>
                           )}
                         </div>
