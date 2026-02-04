@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { calculateFullPrice } from '../lib/currency';
 import { apiFuelTypeToCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName } from '../lib/brandMapping';
+import OptimizedImage from './OptimizedImage';
 
 /**
  * Car card component - displays single car listing
@@ -38,13 +39,12 @@ export default function CarCard({ car, exchangeRates }) {
     >
       {/* Image with overlay badge */}
       <div className="relative overflow-hidden">
-        <img 
-          className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500" 
-          src={imageUrl} 
+        <OptimizedImage
+          src={imageUrl}
           alt={car.carname || `${displayBrandName} ${car.seriesname}`}
-          referrerPolicy="no-referrer"
-          crossOrigin="anonymous"
-          onError={(e) => { e.target.src = '/placeholder-car.jpg'; }}
+          className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          lazy={true}
         />
         {/* Year badge */}
         {car.firstregyear && (

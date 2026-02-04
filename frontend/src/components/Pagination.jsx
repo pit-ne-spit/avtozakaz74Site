@@ -6,7 +6,12 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
   
   if (totalPages <= 1) return null;
 
-  const goToPage = (p) => {
+  const goToPage = (p, e) => {
+    // Предотвращаем стандартное поведение браузера
+    if (e) {
+      e.preventDefault();
+    }
+    
     const newPage = Math.min(totalPages, Math.max(1, p));
     if (newPage !== page) {
       onChange(newPage);
@@ -57,7 +62,7 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 bg-white rounded-xl shadow-md p-4">
       <button
         className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-        onClick={() => goToPage(page - 1)}
+        onClick={(e) => goToPage(page - 1, e)}
         disabled={page <= 1}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +89,7 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md transform scale-110'
                   : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow'
               }`}
-              onClick={() => goToPage(pageNum)}
+              onClick={(e) => goToPage(pageNum, e)}
             >
               {pageNum}
             </button>
@@ -94,7 +99,7 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
       
       <button
         className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-        onClick={() => goToPage(page + 1)}
+        onClick={(e) => goToPage(page + 1, e)}
         disabled={page >= totalPages}
       >
         Следующая

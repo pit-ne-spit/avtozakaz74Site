@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Filters from '../components/Filters';
 import CarCard from '../components/CarCard';
@@ -6,6 +7,10 @@ import Pagination from '../components/Pagination';
 import SortSelector from '../components/SortSelector';
 import { fetchCars } from '../lib/api';
 import { getDisplayBrandName, getApiBrandName } from '../lib/brandMapping';
+import SEOHead, { createWebSiteStructuredData, createOrganizationStructuredData } from '../components/SEOHead';
+import HeroContent from '../components/HeroContent';
+import FAQ from '../components/FAQ';
+import OptimizedBackground from '../components/OptimizedBackground';
 
 // Default filter values
 const defaultFilters = {
@@ -71,6 +76,7 @@ const staticOptions = {
 };
 
 export default function HomePage() {
+  const location = useLocation();
   const [filters, setFilters] = useState(defaultFilters);
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
@@ -90,7 +96,31 @@ export default function HomePage() {
 
   const pageSize = 10;
 
+  // Применяем фильтры из state при переходе со страницы похожих автомобилей
+  useEffect(() => {
+    if (location.state?.filters) {
+      const stateFilters = location.state.filters;
+      const newFilters = {
+        ...defaultFilters,
+        ...stateFilters
+      };
+      setFilters(newFilters);
+      
+      // Если установлен флаг autoSearch, сразу запускаем поиск
+      if (location.state?.autoSearch) {
+        load(1, newFilters, sortBy, sortDirection);
+      }
+      
+      // Очищаем state, чтобы при обновлении страницы фильтры не применялись снова
+      window.history.replaceState({}, document.title);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
+
   const load = async (pageNum = 1, filterValues = filters, sortByValue = sortBy, sortDirValue = sortDirection) => {
+    // Сохраняем текущую позицию скролла перед загрузкой
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setLoading(true);
     setError('');
     
@@ -152,8 +182,11 @@ export default function HomePage() {
       setTotal(totalCount);
       setPage(pageNum);
       
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Восстанавливаем позицию скролла после обновления данных
+      // Используем requestAnimationFrame для гарантии, что DOM обновлен
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosition);
+      });
     } catch (e) {
       console.error('Error fetching cars:', e);
       setError(e.message || 'Ошибка при загрузке данных. Попробуйте еще раз.');
@@ -256,19 +289,38 @@ export default function HomePage() {
     load(1, filters, newSortBy, newDirection);
   };
 
+  // Структурированные данные для SEO
+  const websiteStructuredData = createWebSiteStructuredData();
+  const organizationStructuredData = createOrganizationStructuredData();
+  
+  // Формируем описание с актуальным количеством автомобилей
+  const description = total > 0 
+    ? `Купить автомобиль из Китая, Японии и Кореи. В базе ${total.toLocaleString('ru-RU')} автомобилей. Доставка, таможенное оформление, полный расчет стоимости. Работаем напрямую с экспортными компаниями.`
+    : 'Купить автомобиль из Китая, Японии и Кореи. Доставка, таможенное оформление, полный расчет стоимости. Работаем напрямую с экспортными компаниями.';
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <SEOHead
+        title="Авто из Китая - Купить автомобиль с доставкой в Россию | avtozakaz74"
+        description={description}
+        url="https://avtozakaz74.ru"
+        keywords="авто из китая, купить авто из китая, доставка авто из китая, автомобили из китая, японии, кореи, таможенное оформление, доставка авто"
+        structuredData={[websiteStructuredData, organizationStructuredData]}
+        preloadImages={[
+          { src: '/background.jpg', type: 'image/jpeg' },
+          { src: '/background.webp', type: 'image/webp' }
+        ]}
+      />
       {/* Header */}
       <Header />
 
       {/* Hero section with background and filters */}
-      <div className="relative">
-        {/* Background image */}
-        <div className="h-[575px] bg-cover bg-center relative" style={{backgroundImage: 'url(/background.jpg)'}}>
-          {/* Overlay for better readability */}
-          <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-        
+      <OptimizedBackground
+        src="/background.jpg"
+        webpSrc="/background.webp"
+        className="h-[575px]"
+        overlay={true}
+      >
         {/* Filters over image */}
         <div className="absolute bottom-[60px] left-0 right-0 transform translate-y-1/2 z-10">
           <div className="container mx-auto px-4">
@@ -287,10 +339,11 @@ export default function HomePage() {
             />
           </div>
         </div>
-      </div>
+      </OptimizedBackground>
 
       {/* Main content */}
       <main className="container mx-auto px-4 pt-[36rem] md:pt-64 pb-6 space-y-6">
+        
         {/* Error message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -389,6 +442,12 @@ export default function HomePage() {
             />
           </>
         )}
+        
+        {/* SEO контент после результатов поиска */}
+        <HeroContent totalCars={total} />
+        
+        {/* FAQ секция */}
+        <FAQ />
       </main>
 
       {/* Footer */}
@@ -450,7 +509,7 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  {total.toLocaleString()} автомобилей
+                  Более 200 000 автомобилей
                 </p>
                 <p className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -462,7 +521,14 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-6">
-            <p className="text-gray-400 text-sm text-center">&copy; 2025 АвтоЗаказ 74. Все права защищены.</p>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+              <p>© {new Date().getFullYear()} Автозаказ74. Все права защищены.</p>
+              <div className="flex gap-4">
+                <a href="/privacy" className="hover:text-blue-400 transition-colors">
+                  Политика конфиденциальности
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

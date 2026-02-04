@@ -6,6 +6,10 @@ import { calculateFullPrice, formatPriceBreakdown } from '../lib/currency';
 import { translateColor } from '../lib/colorTranslations';
 import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName } from '../lib/brandMapping';
+import SEOHead, { createCarStructuredData } from '../components/SEOHead';
+import Breadcrumbs from '../components/Breadcrumbs';
+import SimilarCars from '../components/SimilarCars';
+import OptimizedImage from '../components/OptimizedImage';
 
 export default function CarDetailsPage() {
   const { id } = useParams();
@@ -125,6 +129,27 @@ export default function CarDetailsPage() {
   // Get display brand name
   const displayBrandName = getDisplayBrandName(car?.brandname || carDetails?.vehicle_info?.brandname);
 
+  // SEO данные для карточки автомобиля
+  const brand = displayBrandName;
+  const model = carDetails?.vehicle_info?.seriesname || car?.seriesname || '';
+  const year = carDetails?.vehicle_info?.firstregyear || car?.firstregyear || '';
+  const mileage = carDetails?.vehicle_info?.mileage 
+    ? carDetails.vehicle_info.mileage * 10000 
+    : car?.mileage || 0;
+  const price = priceData?.totalFormatted || '';
+  const carImage = photoUrls[0] || car?.imageurl || '';
+  const carUrl = `https://avtozakaz74.ru/car/${id}`;
+  
+  // Формируем описание для SEO
+  const seoDescription = car && carDetails 
+    ? `${brand} ${model} ${year} года. Примерная стоимость в России: ${price}. Пробег ${mileage.toLocaleString('ru-RU')} км. ${fuelTypeRu ? `Тип топлива: ${fuelTypeRu}. ` : ''}Доставка из Китая в Россию.`
+    : 'Автомобиль из Китая с доставкой в Россию.';
+  
+  // Структурированные данные для автомобиля
+  const carStructuredData = car && carDetails 
+    ? createCarStructuredData(car, carDetails)
+    : null;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50">
@@ -166,14 +191,50 @@ export default function CarDetailsPage() {
     return null;
   }
 
+  // Breadcrumbs данные
+  const breadcrumbItems = [
+    { label: 'Главная', url: '/' },
+    { label: 'Автомобили', url: '/' },
+    { label: brand, url: `/?brandname=${encodeURIComponent(brand)}` },
+    { label: `${brand} ${model} ${year}`, url: `/car/${id}` }
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <SEOHead
+        title={`${brand} ${model} ${year} - Купить из Китая | avtozakaz74`}
+        description={seoDescription}
+        image={carImage ? (carImage.startsWith('http') ? carImage : `https:${carImage}`) : 'https://avtozakaz74.ru/logo.png'}
+        url={carUrl}
+        type="product"
+        canonical={carUrl}
+        keywords={`${brand} ${model}, авто из китая, купить ${brand} ${model}, доставка авто из китая, ${brand} ${model} ${year}, автомобиль из китая`}
+        structuredData={carStructuredData}
+      />
       <Header />
 
+      {/* Breadcrumbs */}
+      <div className="container mx-auto px-4 pt-24 pb-2">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
       {/* Back button */}
-      <div className="container mx-auto px-4 pt-24 pb-4">
+      <div className="container mx-auto px-4 pb-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            // Пытаемся закрыть вкладку, если она была открыта через window.open()
+            // Если не получается, возвращаемся назад
+            try {
+              window.close();
+              // Если window.close() не сработал (вкладка не была открыта через window.open),
+              // браузер проигнорирует это, и мы переходим к navigate(-1)
+              setTimeout(() => {
+                navigate(-1);
+              }, 100);
+            } catch (e) {
+              navigate(-1);
+            }
+          }}
           className="flex items-center gap-2 text-gray-700 hover:text-blue-700 transition-colors font-medium"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,13 +253,12 @@ export default function CarDetailsPage() {
               <div className="relative bg-gray-100 rounded-xl overflow-hidden aspect-[4/3] cursor-zoom-in" onClick={() => setIsFullscreen(true)}>
                 {photoUrls.length > 0 ? (
                   <>
-                    <img
+                    <OptimizedImage
                       src={photoUrls[currentPhotoIndex]}
-                      alt={carDetails.vehicle_info?.carname || `${displayBrandName} ${carDetails.vehicle_info?.seriesname}`}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                      crossOrigin="anonymous"
-                      onError={(e) => { e.target.src = '/placeholder-car.jpg'; }}
+                      alt={`${brand} ${model} ${year} - фото ${currentPhotoIndex + 1} из ${photoUrls.length}`}
+                      className="w-full h-full object-cover pointer-events-none"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      lazy={currentPhotoIndex !== 0}
                     />
                     
                     {photoUrls.length > 1 && (
@@ -251,12 +311,12 @@ export default function CarDetailsPage() {
                             actualIndex === currentPhotoIndex ? 'border-blue-700 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
                           }`}
                         >
-                          <img
+                          <OptimizedImage
                             src={url}
-                            alt={`Thumbnail ${actualIndex + 1}`}
+                            alt={`${brand} ${model} ${year} - миниатюра ${actualIndex + 1}`}
                             className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                            crossOrigin="anonymous"
+                            sizes="(max-width: 1024px) 20vw, 10vw"
+                            lazy={true}
                           />
                         </button>
                       );
@@ -420,7 +480,8 @@ export default function CarDetailsPage() {
                 <h3 className="text-lg font-bold text-gray-800">Характеристики</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  {(carDetails.vehicle_info?.mileage || car.mileage) && (
+                  {((carDetails.vehicle_info?.mileage !== undefined && carDetails.vehicle_info?.mileage !== null) || 
+                    (car.mileage !== undefined && car.mileage !== null)) && (
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
                       <svg className="w-5 h-5 text-blue-700 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -428,7 +489,7 @@ export default function CarDetailsPage() {
                       <div>
                         <div className="text-xs text-gray-500">Пробег</div>
                         <div className="font-semibold text-gray-900">
-                          {new Intl.NumberFormat('ru-RU').format((carDetails.vehicle_info?.mileage || car.mileage) * (carDetails.vehicle_info?.mileage ? 10000 : 1))} км
+                          {new Intl.NumberFormat('ru-RU').format((carDetails.vehicle_info?.mileage ?? car.mileage ?? 0) * (carDetails.vehicle_info?.mileage !== undefined ? 10000 : 1))} км
                         </div>
                       </div>
                     </div>
@@ -581,6 +642,9 @@ export default function CarDetailsPage() {
             </div>
           </div>
         </div>
+
+        {/* Похожие автомобили */}
+        <SimilarCars currentCar={car} exchangeRates={exchangeRates} />
       </main>
 
       {/* Fullscreen photo viewer */}
@@ -601,12 +665,12 @@ export default function CarDetailsPage() {
 
           {/* Main fullscreen image */}
           <div className="relative w-full h-full flex items-center justify-center p-8" onClick={(e) => e.stopPropagation()}>
-            <img
+            <OptimizedImage
               src={photoUrls[currentPhotoIndex]}
-              alt={`Photo ${currentPhotoIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-              referrerPolicy="no-referrer"
-              crossOrigin="anonymous"
+              alt={`${brand} ${model} ${year} - фото ${currentPhotoIndex + 1} из ${photoUrls.length}`}
+              className="max-w-full max-h-full object-contain pointer-events-none"
+              sizes="100vw"
+              lazy={false}
             />
 
             {/* Navigation arrows */}

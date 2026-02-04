@@ -170,6 +170,120 @@ app.get('/api/references/metadata', async (req, res) => {
   }
 });
 
+// Generate sitemap.xml
+app.get('/api/sitemap', async (req, res) => {
+  try {
+    console.log('Generating sitemap.xml...');
+    
+    const SITE_URL = 'https://avtozakaz74.ru';
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Получаем все автомобили (делаем запрос с большим limit)
+    // Если автомобилей больше 10000, можно использовать пагинацию
+    const maxCars = 10000; // Максимальное количество автомобилей в sitemap
+    
+    const response = await fetch(`${CHE168_API_URL}/search_car`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': API_TOKEN
+      },
+      body: JSON.stringify({
+        filters: {},
+        pagination: {
+          limit: maxCars,
+          offset: 0
+        },
+        sorting: {
+          sort_by: 'infoid',
+          sort_direction: 'DESC'
+        }
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok || data.status !== 'success') {
+      console.error('API Error generating sitemap:', response.status, data);
+      // Возвращаем базовый sitemap только с главной страницей
+      const basicSitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`;
+      
+      res.setHeader('Content-Type', 'application/xml');
+      return res.send(basicSitemap);
+    }
+
+    const cars = data.data?.cars || [];
+    const totalCars = data.data?.count?.filtered || 0;
+    
+    console.log(`Found ${cars.length} cars (total: ${totalCars}) for sitemap`);
+    
+    // Генерируем XML sitemap
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Главная страница -->
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+`;
+
+    // Добавляем страницы автомобилей
+    cars.forEach(car => {
+      if (car.infoid) {
+        sitemap += `  <url>
+    <loc>${SITE_URL}/car/${car.infoid}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+`;
+      }
+    });
+
+    sitemap += `</urlset>`;
+    
+    // Если автомобилей больше, чем мы получили, можно добавить примечание
+    if (totalCars > maxCars) {
+      console.warn(`Warning: Total cars (${totalCars}) exceeds sitemap limit (${maxCars}). Only first ${maxCars} cars included.`);
+    }
+    
+    res.setHeader('Content-Type', 'application/xml');
+    res.setHeader('Cache-Control', 'public, max-age=3600'); // Кеш на 1 час
+    res.send(sitemap);
+    
+    console.log(`Sitemap generated successfully with ${cars.length + 1} URLs`);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    
+    // Возвращаем базовый sitemap в случае ошибки
+    const SITE_URL = 'https://avtozakaz74.ru';
+    const today = new Date().toISOString().split('T')[0];
+    const basicSitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`;
+    
+    res.setHeader('Content-Type', 'application/xml');
+    res.send(basicSitemap);
+  }
+});
+
 // Trigger manual update of references (admin only)
 app.post('/api/references/update', async (req, res) => {
   try {

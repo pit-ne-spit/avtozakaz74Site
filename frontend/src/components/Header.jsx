@@ -1,4 +1,5 @@
 import React from 'react';
+import OptimizedImage from './OptimizedImage';
 
 export default function Header() {
   return (
@@ -8,17 +9,21 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Логотип и название */}
           <div className="flex items-center gap-3 md:gap-4 shrink-0">
-            <img 
-              src="/logo_pic.png" 
-              alt="Автозаказ74 Logo" 
+            <OptimizedImage
+              src="/logo_pic.png"
+              alt="Автозаказ74 Logo"
               className="h-[50px] md:h-[60px] w-auto object-contain drop-shadow-sm"
-              onError={(e) => { e.target.style.display = 'none'; }}
+              sizes="(max-width: 768px) 50px, 60px"
+              lazy={false}
+              fallback=""
             />
-            <img 
-              src="/logo_text.png" 
-              alt="Автозаказ74" 
+            <OptimizedImage
+              src="/logo_text.png"
+              alt="Автозаказ74"
               className="h-[35px] md:h-[45px] w-auto object-contain drop-shadow-sm"
-              onError={(e) => { e.target.style.display = 'none'; }}
+              sizes="(max-width: 768px) 35px, 45px"
+              lazy={false}
+              fallback=""
             />
           </div>
           
