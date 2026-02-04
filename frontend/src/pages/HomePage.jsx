@@ -273,6 +273,44 @@ export default function HomePage() {
     load(1, defaultFilters);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Обработка прокрутки к фильтрам при переходе с hash #filters
+  useEffect(() => {
+    const scrollToFilters = () => {
+      const filtersElement = document.getElementById('filters');
+      if (filtersElement) {
+        // Прокручиваем к фильтрам с учетом высоты хедера
+        const headerHeight = 80;
+        const elementPosition = filtersElement.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerHeight;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    const handleHashChange = () => {
+      if (window.location.hash === '#filters') {
+        // Небольшая задержка для загрузки контента
+        setTimeout(scrollToFilters, 300);
+      }
+    };
+
+    // Проверяем hash при загрузке страницы
+    if (window.location.hash === '#filters') {
+      // Увеличиваем задержку при первой загрузке, чтобы контент успел отрендериться
+      setTimeout(scrollToFilters, 500);
+    }
+
+    // Слушаем изменения hash
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
   const handleSearch = () => {
     load(1, filters, sortBy, sortDirection);
   };
@@ -322,7 +360,7 @@ export default function HomePage() {
         overlay={true}
       >
         {/* Filters over image */}
-        <div className="absolute bottom-[60px] left-0 right-0 transform translate-y-1/2 z-10">
+        <div id="filters" className="absolute bottom-[60px] left-0 right-0 transform translate-y-1/2 z-10">
           <div className="container mx-auto px-4">
             <Filters
               value={filters}
@@ -524,6 +562,9 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
               <p>© {new Date().getFullYear()} Автозаказ74. Все права защищены.</p>
               <div className="flex gap-4">
+                <a href="/about" className="hover:text-blue-400 transition-colors">
+                  О нас
+                </a>
                 <a href="/privacy" className="hover:text-blue-400 transition-colors">
                   Политика конфиденциальности
                 </a>
