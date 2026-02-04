@@ -17,7 +17,7 @@ export default function CarCard({ car, exchangeRates }) {
   // Get display brand name
   const displayBrandName = getDisplayBrandName(car.brandname);
 
-  // Calculate full price with all fees
+  // Calculate full price with all fees (old calculation)
   const priceData = calculateFullPrice(
     car.price_cny, 
     exchangeRates.CNY, 
@@ -29,6 +29,22 @@ export default function CarCard({ car, exchangeRates }) {
     exchangeRates.EUR,
     car // Передаём объект для валидации пошлины
   );
+  
+  // Get new price from drom.ru API calculation (if available)
+  const dromPrice = car.drom_price_calculation?.totalPrice;
+  const dromPriceValue = dromPrice?.value ? parseInt(dromPrice.value) : null;
+  const dromPriceFormatted = dromPriceValue 
+    ? `${(dromPriceValue / 1000000).toFixed(2)} млн ₽`
+    : null;
+  
+  // Debug: логирование для проверки данных
+  if (car.infoid && (dromPriceFormatted || car.drom_price_calculation)) {
+    console.log(`[CarCard] Car ${car.infoid}:`, {
+      hasDromCalculation: !!car.drom_price_calculation,
+      dromPriceFormatted,
+      dromPriceValue
+    });
+  }
 
   return (
     <Link
@@ -63,9 +79,25 @@ export default function CarCard({ car, exchangeRates }) {
         {/* Price - prominent */}
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg px-4 py-3 mb-3">
           <div className="text-xs text-gray-600 mb-1">Примерная стоимость в России</div>
-          <div className="text-3xl font-extrabold text-green-600">
-            ~{priceData.totalFormatted}
-          </div>
+          
+          {/* New price from drom.ru API (if available) */}
+          {dromPriceFormatted ? (
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <div className="text-3xl font-extrabold text-green-600">
+                  {dromPriceFormatted}
+                </div>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">drom.ru</span>
+              </div>
+              <div className="text-sm text-gray-500 line-through">
+                Старая: ~{priceData.totalFormatted}
+              </div>
+            </div>
+          ) : (
+            <div className="text-3xl font-extrabold text-green-600">
+              ~{priceData.totalFormatted}
+            </div>
+          )}
         </div>
         
         {/* Specs grid */}

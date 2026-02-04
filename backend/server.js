@@ -7,6 +7,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cron from 'node-cron';
 import { generateReferences } from './scripts/updateReferences.js';
+import { calculatePriceWithDrom } from './scripts/dromPriceCalculator.js';
+
+// Debug: проверка импорта
+console.log('[Backend] Drom price calculator imported:', typeof calculatePriceWithDrom);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,7 +33,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Proxy endpoint for search_car
+// Proxy endpoint for search_car with drom.ru price calculation
 app.post('/api/search_car', async (req, res) => {
   try {
     console.log('Proxying search_car request');
@@ -49,6 +53,70 @@ app.post('/api/search_car', async (req, res) => {
     if (!response.ok) {
       console.error('API Error:', response.status, data);
       return res.status(response.status).json(data);
+    }
+
+    // Debug: проверка структуры данных
+    console.log(`[Price Calculation] Data status:`, data.status);
+    console.log(`[Price Calculation] Has cars:`, !!data.data?.cars);
+    console.log(`[Price Calculation] Cars is array:`, Array.isArray(data.data?.cars));
+    console.log(`[Price Calculation] Has rates:`, !!data.data?.rates);
+    console.log(`[Price Calculation] Rates:`, data.data?.rates);
+    
+    // If we have cars and rates, calculate prices using drom.ru API
+    if (data.status === 'success' && data.data?.cars && Array.isArray(data.data.cars) && data.data.rates) {
+      console.log(`[Price Calculation] Processing ${data.data.cars.length} cars with drom.ru API`);
+      console.log(`[Price Calculation] First car sample:`, JSON.stringify(data.data.cars[0], null, 2));
+      
+      const rates = data.data.rates;
+      const originalCars = [...data.data.cars]; // Save original array
+      
+      // Process cars with price calculation (with timeout per car: 5 seconds)
+      const carsWithPrices = await Promise.allSettled(
+        originalCars.map(async (car) => {
+          const dromResult = await calculatePriceWithDrom(car, rates, 5000);
+          
+          if (dromResult) {
+            // Add calculated price data to car object
+            return {
+              ...car,
+              drom_price_calculation: {
+                totalPrice: dromResult.totalPrice,
+                details: dromResult.details
+              }
+            };
+          }
+          
+          // If calculation failed, return car as-is
+          return car;
+        })
+      );
+      
+      // Extract values from Promise.allSettled results
+      // If promise failed, use original car from original array
+      data.data.cars = carsWithPrices.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        } else {
+          // If calculation failed, return original car
+          console.error(`[Price Calculation] Failed for car ${originalCars[index]?.infoid}:`, result.reason?.message || result.reason);
+          return originalCars[index] || {};
+        }
+      });
+      
+      const successCount = carsWithPrices.filter(r => r.status === 'fulfilled' && r.value?.drom_price_calculation).length;
+      console.log(`[Price Calculation] Completed: ${successCount}/${data.data.cars.length} cars calculated successfully`);
+      
+      // Debug: показать пример обогащенного автомобиля
+      if (successCount > 0) {
+        const enrichedCar = data.data.cars.find(c => c.drom_price_calculation);
+        if (enrichedCar) {
+          console.log(`[Price Calculation] Sample enriched car:`, {
+            infoid: enrichedCar.infoid,
+            hasDromCalculation: !!enrichedCar.drom_price_calculation,
+            totalPrice: enrichedCar.drom_price_calculation?.totalPrice
+          });
+        }
+      }
     }
 
     res.json(data);
