@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import OptimizedImage from './OptimizedImage';
 
 export default function Header() {
@@ -8,7 +9,10 @@ export default function Header() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Логотип и название */}
-          <div className="flex items-center gap-3 md:gap-4 shrink-0">
+          <Link 
+            to="/" 
+            className="flex items-center gap-3 md:gap-4 shrink-0 hover:opacity-80 transition-opacity"
+          >
             <OptimizedImage
               src="/logo_pic.png"
               alt="Автозаказ74 Logo"
@@ -25,7 +29,7 @@ export default function Header() {
               lazy={false}
               fallback=""
             />
-          </div>
+          </Link>
           
           {/* Контакты (скрыты на маленьких экранах, видны на больших) */}
           <div className="hidden lg:flex flex-col items-end gap-1 text-sm text-gray-800">
