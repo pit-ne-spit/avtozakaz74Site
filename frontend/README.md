@@ -1,6 +1,6 @@
-# Stage 7: Фронтенд для заказа автомобилей
+# Frontend: Avtozakaz74
 
-React + Vite + Tailwind CSS фронтенд для поиска и заказа автомобилей из Китая.
+React + Vite + Tailwind CSS фронтенд для поиска и заказа автомобилей из Китая с полной SEO оптимизацией.
 
 ## 🚀 Быстрый старт
 
@@ -53,25 +53,46 @@ docker compose down
 ## 📁 Структура проекта
 
 ```
-stage7_frontend/
+frontend/
 ├── src/
 │   ├── components/
-│   │   ├── Filters.jsx       # Фильтры поиска
-│   │   ├── CarCard.jsx        # Карточка автомобиля
-│   │   └── Pagination.jsx     # Пагинация
+│   │   ├── Filters.jsx              # Фильтры поиска
+│   │   ├── CarCard.jsx             # Карточка автомобиля
+│   │   ├── Pagination.jsx          # Пагинация
+│   │   ├── SortSelector.jsx        # Сортировка результатов
+│   │   ├── Header.jsx              # Хедер сайта
+│   │   ├── SEOHead.jsx             # SEO мета-теги
+│   │   ├── Breadcrumbs.jsx         # Хлебные крошки
+│   │   ├── FAQ.jsx                 # FAQ секция
+│   │   ├── HeroContent.jsx         # SEO контент
+│   │   ├── SimilarCars.jsx         # Похожие автомобили
+│   │   ├── CookieConsent.jsx       # Cookie баннер
+│   │   ├── OptimizedImage.jsx      # Оптимизированные изображения
+│   │   └── OptimizedBackground.jsx # Оптимизированный фон
+│   ├── pages/
+│   │   ├── HomePage.jsx            # Главная страница
+│   │   ├── CarDetailsPage.jsx      # Детали автомобиля
+│   │   ├── AboutPage.jsx           # О нас
+│   │   ├── PrivacyPolicyPage.jsx   # Политика конфиденциальности
+│   │   └── CookiePolicyPage.jsx    # Политика cookies
 │   ├── lib/
-│   │   └── api.js             # API клиент
-│   ├── App.jsx                # Главный компонент
-│   ├── main.jsx               # Точка входа
-│   └── index.css              # Стили + Tailwind
+│   │   ├── api.js                  # API клиент
+│   │   ├── currency.js             # Расчет стоимости
+│   │   ├── brandMapping.js         # Маппинг брендов
+│   │   ├── colorTranslations.js    # Перевод цветов
+│   │   └── fuelTypes.js            # Типы топлива
+│   ├── App.jsx                     # Роутер приложения
+│   ├── main.jsx                    # Точка входа
+│   └── index.css                   # Стили + Tailwind
 ├── public/
-│   └── template.html          # Референс шаблон
-├── index.html                 # HTML точка входа
-├── vite.config.js             # Vite конфигурация
-├── tailwind.config.js         # Tailwind конфигурация
-├── Dockerfile                 # Docker образ
-├── nginx.conf                 # Nginx конфигурация
-└── package.json               # Зависимости
+│   ├── robots.txt                  # Robots.txt
+│   └── ...
+├── index.html                      # HTML точка входа
+├── vite.config.js                  # Vite конфигурация
+├── tailwind.config.js              # Tailwind конфигурация
+├── Dockerfile                      # Docker образ
+├── nginx.conf                      # Nginx конфигурация
+└── package.json                    # Зависимости
 ```
 
 ## 🔧 Технологии
@@ -90,9 +111,12 @@ stage7_frontend/
 
 ### API эндпоинты:
 
-- `GET /api/cars` - Поиск автомобилей
-- `GET /api/stats` - Статистика
-- `GET /api/health` - Статус API
+- `POST /api/search_car` - Поиск автомобилей
+- `POST /api/get_car_info` - Детальная информация об автомобиле
+- `POST /api/getAvailableFilters` - Доступные значения фильтров
+- `GET /api/brands` - Список брендов
+- `GET /api/models` - Справочник моделей
+- `GET /api/sitemap` - Генерация sitemap.xml
 
 ## 📝 Доступные фильтры
 
@@ -153,6 +177,10 @@ sudo firewall-cmd --reload
 ✅ API скрыт от внешнего доступа  
 ✅ Gzip сжатие  
 ✅ Кеширование статики  
+✅ SEO оптимизация (мета-теги, структурированные данные, sitemap)  
+✅ Оптимизация изображений (WebP, lazy loading)  
+✅ Cookie consent баннер  
+✅ Информационные страницы (О нас, Политика конфиденциальности)  
 
 ## 🔐 Безопасность
 

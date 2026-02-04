@@ -6,7 +6,7 @@ import CarCard from '../components/CarCard';
 import Pagination from '../components/Pagination';
 import SortSelector from '../components/SortSelector';
 import { fetchCars } from '../lib/api';
-import { getDisplayBrandName, getApiBrandName } from '../lib/brandMapping';
+import { getDisplayBrandName, getApiBrandName, getApiModelName } from '../lib/brandMapping';
 import SEOHead, { createWebSiteStructuredData, createOrganizationStructuredData } from '../components/SEOHead';
 import HeroContent from '../components/HeroContent';
 import FAQ from '../components/FAQ';
@@ -149,6 +149,10 @@ export default function HomePage() {
             } else {
               params[key] = getApiBrandName(value);
             }
+          }
+          // Convert model names from display to API format (e.g., "Jimny (Импорт)" -> "Jimny (Imported)")
+          else if (key === 'seriesname') {
+            params[key] = getApiModelName(value);
           }
           // Convert engine volume from liters to milliliters
           else if (key === 'engine_volume_from' || key === 'engine_volume_to') {

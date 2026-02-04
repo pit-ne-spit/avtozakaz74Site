@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchCars } from '../lib/api';
 import CarCard from './CarCard';
-import { getDisplayBrandName, getApiBrandName } from '../lib/brandMapping';
+import { getDisplayBrandName, getApiBrandName, getApiModelName } from '../lib/brandMapping';
 
 /**
  * Компонент для отображения похожих автомобилей
@@ -25,10 +25,12 @@ export default function SimilarCars({ currentCar, exchangeRates }) {
         let similarCarsList = [];
         
         // Если есть модель, сначала ищем по марке и модели
+        // currentCar.seriesname приходит из API, так что это уже API формат
+        // Но на всякий случай убедимся, что используем правильный формат
         if (currentCar.seriesname) {
           const sameModelData = await fetchCars({
-            brandname: currentCar.brandname,
-            seriesname: currentCar.seriesname,
+            brandname: currentCar.brandname, // Это уже API формат из search_car
+            seriesname: currentCar.seriesname, // Это уже API формат из search_car
             limit: 15,
             sort_by: 'infoid',
             sort_direction: 'DESC'
@@ -105,8 +107,10 @@ export default function SimilarCars({ currentCar, exchangeRates }) {
             };
             
             // Добавляем модель, если она есть
+            // currentCar.seriesname уже в API формате, но на всякий случай преобразуем
             if (currentCar?.seriesname) {
-              filters.seriesname = currentCar.seriesname;
+              // Убеждаемся, что используем API формат (на случай если где-то уже нормализовано)
+              filters.seriesname = getApiModelName(currentCar.seriesname);
             }
             
             navigate('/', {

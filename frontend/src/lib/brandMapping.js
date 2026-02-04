@@ -82,7 +82,7 @@ export const BRAND_NAME_MAPPING = {
   'Chery New Energy': 'Chery New Energy',
   'Exeed': 'Exeed',
   'Jetour': 'Jetour',
-  'Jietu': 'Jetour',
+  'Jietu': 'Jetour', // Chinese name → display as Jetour
   'Jietu Mountains And Seas': 'Jetour Shanhai',
   
   // Other Chinese brands
@@ -98,7 +98,7 @@ export const BRAND_NAME_MAPPING = {
   'Cheetah Cars': 'Cheetah',
   'Foday': 'Foday',
   'Futian': 'Foton',
-  'Gain Momentum': 'Jetour',
+  'Gain Momentum': 'Gain Momentum', // Keep as is, don't map to Jetour
   'Galloping': 'Benz',
   'Gaohe Automobile': 'HiPhi',
   'George Patton': 'George Patton',
@@ -238,12 +238,30 @@ export function getDisplayBrandName(apiBrandName) {
 export function getApiBrandName(displayName) {
   if (!displayName) return '';
   
-  // Find the key that maps to this display name
-  const entry = Object.entries(BRAND_NAME_MAPPING).find(
+  // Find all keys that map to this display name
+  const matchingEntries = Object.entries(BRAND_NAME_MAPPING).filter(
     ([_, mappedName]) => mappedName === displayName
   );
   
-  return entry ? entry[0] : displayName;
+  if (matchingEntries.length === 0) {
+    return displayName;
+  }
+  
+  // Special handling for brands with multiple API names mapping to same display name
+  if (displayName === 'Jetour') {
+    // When user selects "Jetour", send "Jietu" to API (Chinese name)
+    // "Gain Momentum" is now separate and maps to itself
+    const jietuEntry = matchingEntries.find(([key]) => key === 'Jietu');
+    if (jietuEntry) {
+      return jietuEntry[0]; // Return "Jietu"
+    }
+    // Fallback to first entry if "Jietu" not found (shouldn't happen)
+    return matchingEntries[0][0];
+  }
+  
+  // For other brands, return the first matching entry
+  // Usually the first entry is the most common/primary API name
+  return matchingEntries[0][0];
 }
 
 /**
@@ -261,4 +279,53 @@ export function getDisplayBrandList() {
  */
 export function getApiBrandList() {
   return Object.keys(BRAND_NAME_MAPPING).sort();
+}
+
+/**
+ * Convert display model name back to API format
+ * Reverses all normalizations done in normalize-models.js
+ * 
+ * This function works for ALL models, not just specific ones.
+ * It reverses:
+ * - "(Импорт)" -> "(Imported)" (language translation)
+ * - "A4L" -> "A4l" (capitalization - API expects lowercase suffix)
+ * - "E-tron" -> "e-tron" (capitalization)
+ * - "RS 3" -> "Rs 3" (capitalization - but keep uppercase for known prefixes)
+ * 
+ * Examples:
+ * - "Jimny (Импорт)" -> "Jimny (Imported)"
+ * - "A4L" -> "A4l"
+ * - "Q5L" -> "Q5l"
+ * - "E-tron" -> "e-tron"
+ * 
+ * @param {string} displayModelName - Display model name (e.g., "Jimny (Импорт)", "A4L")
+ * @returns {string} API model name (e.g., "Jimny (Imported)", "A4l")
+ */
+export function getApiModelName(displayModelName) {
+  if (!displayModelName) return '';
+  
+  let apiModelName = displayModelName;
+  
+  // 1. Convert "(Импорт)" back to "(Imported)" - CRITICAL for API
+  // The 'g' flag ensures ALL occurrences are replaced
+  apiModelName = apiModelName.replace(/\(Импорт\)/g, '(Imported)');
+  
+  // 2. Reverse capitalization of model suffixes (A4L -> A4l, Q5L -> Q5l)
+  // Pattern: uppercase letter + digits + uppercase letter at end -> lowercase last letter
+  // This matches patterns like A4L, Q5L, X3L, etc.
+  apiModelName = apiModelName.replace(/([A-Z]\d+)([A-Z])(\s|$|\))/g, (match, prefix, letter, suffix) => {
+    // Only reverse if it's a single uppercase letter suffix (like L in A4L)
+    if (letter.length === 1 && /[A-Z]/.test(letter)) {
+      return prefix + letter.toLowerCase() + suffix;
+    }
+    return match;
+  });
+  
+  // 3. Reverse E-tron -> e-tron (API expects lowercase)
+  apiModelName = apiModelName.replace(/\bE-tron\b/g, 'e-tron');
+  
+  // Note: RS, GT, SQ prefixes are kept uppercase as API usually expects them that way
+  // But if API expects lowercase, we can add: apiModelName = apiModelName.replace(/\bRS\s/g, 'Rs ');
+  
+  return apiModelName;
 }
