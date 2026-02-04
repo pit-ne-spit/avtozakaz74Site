@@ -8,6 +8,7 @@ export default function PrivacyPolicyPage() {
         title="Политика конфиденциальности и обработки персональных данных | avtozakaz74"
         description="Политика конфиденциальности и обработки персональных данных компании Автозаказ74"
         url="https://avtozakaz74.ru/privacy"
+        canonical="https://avtozakaz74.ru/privacy"
       />
       <Header />
       

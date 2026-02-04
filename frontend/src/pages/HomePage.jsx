@@ -342,6 +342,7 @@ export default function HomePage() {
         title="Авто из Китая - Купить автомобиль с доставкой в Россию | avtozakaz74"
         description={description}
         url="https://avtozakaz74.ru"
+        canonical="https://avtozakaz74.ru"
         keywords="авто из китая, купить авто из китая, доставка авто из китая, автомобили из китая, японии, кореи, таможенное оформление, доставка авто"
         structuredData={[websiteStructuredData, organizationStructuredData]}
         preloadImages={[

@@ -206,7 +206,7 @@ app.get('/api/sitemap', async (req, res) => {
     
     if (!response.ok || data.status !== 'success') {
       console.error('API Error generating sitemap:', response.status, data);
-      // Возвращаем базовый sitemap только с главной страницей
+      // Возвращаем базовый sitemap с главной и статическими страницами
       const basicSitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -214,6 +214,24 @@ app.get('/api/sitemap', async (req, res) => {
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/about</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/privacy</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/cookie-policy</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>`;
       
@@ -236,13 +254,36 @@ app.get('/api/sitemap', async (req, res) => {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  <!-- Статические страницы -->
+  <url>
+    <loc>${SITE_URL}/about</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/privacy</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/cookie-policy</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
 `;
 
-    // Добавляем страницы автомобилей
+    // Добавляем страницы автомобилей (убираем дубликаты по ID)
+    const uniqueCarIds = new Set();
     cars.forEach(car => {
-      if (car.infoid) {
+      if (car.infoid && !uniqueCarIds.has(car.infoid)) {
+        uniqueCarIds.add(car.infoid);
+        // Используем канонический URL без trailing slash
+        const carUrl = `${SITE_URL}/car/${car.infoid}`;
         sitemap += `  <url>
-    <loc>${SITE_URL}/car/${car.infoid}</loc>
+    <loc>${carUrl}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

@@ -8,6 +8,7 @@ export default function CookiePolicyPage() {
         title="Политика использования файлов cookie | avtozakaz74"
         description="Политика использования файлов cookie на сайте Автозаказ74"
         url="https://avtozakaz74.ru/cookie-policy"
+        canonical="https://avtozakaz74.ru/cookie-policy"
       />
       <Header />
       
