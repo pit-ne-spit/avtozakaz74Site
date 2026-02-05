@@ -53,23 +53,40 @@ export function calculateVehicleAgeCategory(firstRegShortDate, firstRegYear) {
 export function mapEngineType(fuelType) {
   if (!fuelType) return 'DIESEL_OR_GASOLINE';
   
+  const fuelTypeLower = fuelType.toLowerCase();
+  
+  // Электрические автомобили -> ELECTRIC_MOTOR
+  // Проверяем точное совпадение сначала
+  if (fuelType === 'Pure Electric' || 
+      fuelTypeLower === 'pure electric' ||
+      fuelTypeLower === 'electric' ||
+      fuelTypeLower === 'ev' ||
+      fuelTypeLower === 'battery electric') {
+    return 'ELECTRIC_MOTOR';
+  }
+  
   // Последовательный гибрид (Extended Range) -> ELECTRIC_MOTOR
-  if (fuelType === 'Extended Range') {
+  if (fuelType === 'Extended Range' || fuelTypeLower.includes('extended range')) {
     return 'ELECTRIC_MOTOR';
   }
   
   // Дизель -> DIESEL_OR_GASOLINE
-  if (fuelType === 'Diesel Fuel') {
+  if (fuelType === 'Diesel Fuel' || fuelTypeLower.includes('diesel')) {
     return 'DIESEL_OR_GASOLINE';
   }
   
   // Бензин -> DIESEL_OR_GASOLINE
-  if (fuelType === 'Gasoline' || fuelType === 'Gasoline+CNG') {
+  if (fuelType === 'Gasoline' || fuelType === 'Gasoline+CNG' || fuelTypeLower.includes('gasoline')) {
     return 'DIESEL_OR_GASOLINE';
   }
   
-  // Для остальных типов (гибриды, электричество) используем DIESEL_OR_GASOLINE по умолчанию
-  // Можно расширить маппинг при необходимости
+  // Гибриды (не последовательные) -> DIESEL_OR_GASOLINE
+  if (fuelTypeLower.includes('hybrid')) {
+    return 'DIESEL_OR_GASOLINE';
+  }
+  
+  // Для остальных типов используем DIESEL_OR_GASOLINE по умолчанию
+  console.warn(`[Drom API] Unknown fuel type: ${fuelType}, using DIESEL_OR_GASOLINE`);
   return 'DIESEL_OR_GASOLINE';
 }
 
@@ -117,7 +134,11 @@ export function buildDromRequestParams(car, rates) {
     return null;
   }
   
-  if (!car.engine_volume_ml || car.engine_volume_ml <= 0) {
+  const engineType = mapEngineType(car.fuel_type);
+  const isElectric = engineType === 'ELECTRIC_MOTOR';
+  
+  // Для электрических автомобилей engine_volume_ml может отсутствовать или быть 0
+  if (!isElectric && (!car.engine_volume_ml || car.engine_volume_ml <= 0)) {
     console.error(`[Drom API] Invalid engine_volume_ml: ${car.engine_volume_ml} for car ${car.infoid}`);
     return null;
   }
@@ -139,18 +160,24 @@ export function buildDromRequestParams(car, rates) {
     return num.toFixed(2);
   };
   
+  // Для электрических автомобилей engineVolumeInCubicCentimeters не передается
+  // Для остальных - обязательно
   const params = {
     price: car.price_cny.toString(),
     currency: 'CNY',
     vehicleAge: vehicleAge,
-    engineType: mapEngineType(car.fuel_type),
-    engineVolumeInCubicCentimeters: car.engine_volume_ml.toString(),
+    engineType: engineType,
     engineHorsePower: engineHorsePower.toString(),
     importPurpose: 'USAGE',
     EUR: formatCurrency(rates?.EUR) || '91.11',
     USD: formatCurrency(rates?.USD) || '76.91',
     CNY: formatCurrency(rates?.CNY) || '11.05'
   };
+  
+  // Для неэлектрических автомобилей добавляем объем двигателя
+  if (!isElectric) {
+    params.engineVolumeInCubicCentimeters = car.engine_volume_ml.toString();
+  }
   
   return params;
 }
