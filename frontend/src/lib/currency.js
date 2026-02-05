@@ -106,15 +106,12 @@ export function formatPriceBreakdown(breakdown) {
       },
       {
         label: 'Таможенные платежи',
-        value: `${fmt(customsTotal)} ₽`,
+        value: `${fmt(customsTotal + breakdown.recyclingFee)} ₽`,
         subValues: [
           `Единая ставка налога: ${fmt(breakdown.importDutyRub)} ₽`,
-          `Таможенное оформление: ${fmt(breakdown.customsFee)} ₽`
+          `Таможенное оформление: ${fmt(breakdown.customsFee)} ₽`,
+          `Утилизационный сбор: ${fmt(breakdown.recyclingFee)} ₽`
         ]
-      },
-      {
-        label: 'Утилизационный сбор',
-        value: `${fmt(breakdown.recyclingFee)} ₽`
       },
       {
         label: 'Импорт из Китая в Россию',
@@ -130,7 +127,7 @@ export function formatPriceBreakdown(breakdown) {
         value: `${fmt(breakdown.commission)} ₽`
       },
       {
-        label: 'Доставка Челябинск/Москва',
+        label: 'Доставка по России',
         value: `${fmt(breakdown.deliveryFee)} ₽`
       },
       {
@@ -142,5 +139,112 @@ export function formatPriceBreakdown(breakdown) {
     ],
     rateCny: breakdown.rateCny,
     rateEur: breakdown.rateEur
+  };
+}
+
+/**
+ * Format drom.ru price breakdown for display
+ * @param {object} dromDetails - Details from drom.ru API
+ * @param {number} totalPrice - Total price from drom.ru API
+ * @param {object} exchangeRates - Exchange rates {CNY, EUR}
+ * @returns {object} Formatted breakdown for UI
+ */
+export function formatDromPriceBreakdown(dromDetails, totalPrice, exchangeRates = {}) {
+  if (!dromDetails) return null;
+  
+  const fmt = (value) => {
+    const num = typeof value === 'string' ? parseInt(value) : value;
+    return new Intl.NumberFormat('ru-RU').format(Math.round(num));
+  };
+  
+  const steps = [];
+  
+  // Цена автомобиля в Китае
+  if (dromDetails.PRICE) {
+    steps.push({
+      label: 'Цена автомобиля в Китае',
+      value: `${fmt(dromDetails.PRICE.major.value)} ₽`,
+      subValue: dromDetails.PRICE.alt 
+        ? `¥${fmt(dromDetails.PRICE.alt.value)}`
+        : null
+    });
+  }
+  
+  // Таможенные платежи (Единая ставка налога, Таможенное оформление и Утилизационный сбор в subvalues)
+  const customsSubValues = [];
+  if (dromDetails.CUSTOMS_DUTY) {
+    customsSubValues.push(`Единая ставка налога: ${fmt(dromDetails.CUSTOMS_DUTY.major.value)} ₽`);
+  }
+  if (dromDetails.CUSTOMS_FEE) {
+    customsSubValues.push(`Таможенное оформление: ${fmt(dromDetails.CUSTOMS_FEE.major.value)} ₽`);
+  }
+  if (dromDetails.RECYCLING_FEE) {
+    customsSubValues.push(`Утилизационный сбор: ${fmt(dromDetails.RECYCLING_FEE.major.value)} ₽`);
+  }
+  
+  if (customsSubValues.length > 0) {
+    // Сумма пошлины, оформления и утилизационного сбора
+    const customsTotal = (parseInt(dromDetails.CUSTOMS_DUTY?.major.value || 0) + 
+                         parseInt(dromDetails.CUSTOMS_FEE?.major.value || 0) +
+                         parseInt(dromDetails.RECYCLING_FEE?.major.value || 0));
+    
+    steps.push({
+      label: 'Таможенные платежи',
+      value: `${fmt(customsTotal)} ₽`,
+      subValues: customsSubValues
+    });
+  }
+  
+  // Импорт из Китая в Россию (фиксированное значение: 15000 CNY * курс)
+  const chinaServices = 15000 * (exchangeRates.CNY || 11.05);
+  steps.push({
+    label: 'Импорт из Китая в Россию',
+    value: `${fmt(chinaServices)} ₽`,
+    subValue: '¥15 000'
+  });
+  
+  // Оформление (фиксированное значение: 75 000 ₽)
+  steps.push({
+    label: 'Оформление',
+    value: '75 000 ₽'
+  });
+  
+  // Комиссия компании (фиксированное значение: 100 000 ₽)
+  steps.push({
+    label: 'Комиссия компании',
+    value: '100 000 ₽'
+  });
+  
+  // Доставка по России (фиксированное значение: 200 000 ₽)
+  const deliveryFee = 200000;
+  steps.push({
+    label: 'Доставка по России',
+    value: `${fmt(deliveryFee)} ₽`
+  });
+  
+  // Рассчитываем итоговую стоимость как сумму всех компонентов
+  const calculatedTotal = 
+    (parseInt(dromDetails.PRICE?.major.value || 0)) +
+    (parseInt(dromDetails.CUSTOMS_DUTY?.major.value || 0) + 
+     parseInt(dromDetails.CUSTOMS_FEE?.major.value || 0) +
+     parseInt(dromDetails.RECYCLING_FEE?.major.value || 0)) +
+    chinaServices +
+    75000 + // Оформление
+    100000 + // Комиссия компании
+    deliveryFee;
+  
+  // Итоговая стоимость
+  steps.push({
+    label: 'ОРИЕНТИРОВОЧНАЯ СТОИМОСТЬ В РОССИИ',
+    value: `${fmt(calculatedTotal)} ₽`,
+    isTotal: true,
+    hasAsterisk: true
+  });
+  
+  return {
+    steps,
+    total: calculatedTotal,
+    rateCny: exchangeRates.CNY,
+    rateEur: exchangeRates.EUR
   };
 }

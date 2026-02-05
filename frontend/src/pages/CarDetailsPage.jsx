@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { fetchCars, fetchCarById } from '../lib/api';
-import { calculateFullPrice, formatPriceBreakdown } from '../lib/currency';
+import { calculateFullPrice, formatPriceBreakdown, formatDromPriceBreakdown } from '../lib/currency';
 import { translateColor } from '../lib/colorTranslations';
 import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName } from '../lib/brandMapping';
@@ -103,11 +103,12 @@ export default function CarDetailsPage() {
   
   // Get new price from drom.ru API calculation (if available)
   const dromCalculation = car?.drom_price_calculation;
-  const dromPriceValue = dromCalculation?.totalPrice?.value ? parseInt(dromCalculation.totalPrice.value) : null;
+  const dromDetails = dromCalculation?.details;
+  const dromBreakdown = formatDromPriceBreakdown(dromDetails, null, exchangeRates);
+  const dromPriceValue = dromBreakdown?.total || null;
   const dromPriceFormatted = dromPriceValue 
     ? `${(dromPriceValue / 1000000).toFixed(2)} млн ₽`
     : null;
-  const dromDetails = dromCalculation?.details;
   
   // Debug: логирование для проверки данных
   if (car?.infoid) {
@@ -424,103 +425,13 @@ export default function CarDetailsPage() {
               </div>
 
               {/* Price with breakdown */}
-              <div className="space-y-4">
-                {/* New price from drom.ru API */}
-                {dromPriceFormatted && (
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-300">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm text-gray-600">Расчетная стоимость (drom.ru API)</div>
-                        <span className="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded font-semibold">НОВОЕ</span>
-                      </div>
-                      {dromDetails && (
-                        <button
-                          onClick={() => setShowBreakdown(!showBreakdown)}
-                          className="text-xs text-blue-700 hover:text-blue-800 flex items-center gap-1 font-medium"
-                        >
-                          <svg className={`w-4 h-4 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                          {showBreakdown ? 'Скрыть расчёт' : 'Подробный расчёт'}
-                        </button>
-                      )}
-                    </div>
-                    <div className="text-4xl font-extrabold text-blue-600">
-                      {dromPriceFormatted}
-                    </div>
-                    
-                    {/* Drom.ru breakdown */}
-                    {showBreakdown && dromDetails && (
-                      <div className="mt-4 pt-4 border-t border-blue-200 space-y-2.5">
-                        {dromDetails.PRICE && (
-                          <div className="flex justify-between items-start">
-                            <span className="text-sm text-gray-600">Цена автомобиля</span>
-                            <div className="text-right">
-                              <div className="text-sm font-semibold text-gray-800">
-                                {parseInt(dromDetails.PRICE.major.value).toLocaleString('ru-RU')} ₽
-                              </div>
-                              {dromDetails.PRICE.alt && (
-                                <div className="text-xs text-gray-500">
-                                  {parseInt(dromDetails.PRICE.alt.value).toLocaleString('ru-RU')} {dromDetails.PRICE.alt.currency}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        {dromDetails.CUSTOMS_DUTY && (
-                          <div className="flex justify-between items-start">
-                            <span className="text-sm text-gray-600">Таможенная пошлина</span>
-                            <div className="text-right">
-                              <div className="text-sm font-semibold text-gray-800">
-                                {parseInt(dromDetails.CUSTOMS_DUTY.major.value).toLocaleString('ru-RU')} ₽
-                              </div>
-                              {dromDetails.CUSTOMS_DUTY.alt && (
-                                <div className="text-xs text-gray-500">
-                                  {parseInt(dromDetails.CUSTOMS_DUTY.alt.value).toLocaleString('ru-RU')} {dromDetails.CUSTOMS_DUTY.alt.currency}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        {dromDetails.CUSTOMS_FEE && (
-                          <div className="flex justify-between items-start">
-                            <span className="text-sm text-gray-600">Таможенное оформление</span>
-                            <div className="text-sm font-semibold text-gray-800">
-                              {parseInt(dromDetails.CUSTOMS_FEE.major.value).toLocaleString('ru-RU')} ₽
-                            </div>
-                          </div>
-                        )}
-                        {dromDetails.RECYCLING_FEE && (
-                          <div className="flex justify-between items-start">
-                            <span className="text-sm text-gray-600">Утилизационный сбор</span>
-                            <div className="text-sm font-semibold text-gray-800">
-                              {parseInt(dromDetails.RECYCLING_FEE.major.value).toLocaleString('ru-RU')} ₽
-                            </div>
-                          </div>
-                        )}
-                        {dromDetails.CUSTOMS_DUTY_AND_FEES && (
-                          <div className="flex justify-between items-start pt-3 border-t-2 border-blue-300">
-                            <span className="text-base font-bold text-gray-900">Таможенные платежи</span>
-                            <div className="text-base font-bold text-blue-700">
-                              {parseInt(dromDetails.CUSTOMS_DUTY_AND_FEES.major.value).toLocaleString('ru-RU')} ₽
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Old price calculation */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-5">
+              {dromPriceFormatted && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <div className="text-sm text-gray-600">Старый расчет</div>
-                      {dromPriceFormatted && (
-                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">УСТАРЕВШИЙ</span>
-                      )}
+                      <div className="text-sm text-gray-600">Расчетная стоимость</div>
                     </div>
-                    {breakdown && (
+                    {dromBreakdown && (
                       <button
                         onClick={() => setShowBreakdown(!showBreakdown)}
                         className="text-xs text-blue-700 hover:text-blue-800 flex items-center gap-1 font-medium"
@@ -532,60 +443,62 @@ export default function CarDetailsPage() {
                       </button>
                     )}
                   </div>
-                  <div className={`text-4xl font-extrabold ${dromPriceFormatted ? 'text-gray-500 line-through' : 'text-green-600'}`}>
-                    ~{priceData.totalFormatted}
+                  <div className="text-4xl font-extrabold text-blue-600">
+                    {dromPriceFormatted}
                   </div>
-                
-                {/* Detailed breakdown */}
-                {showBreakdown && breakdown && (
-                  <div className="mt-4 pt-4 border-t border-green-200 space-y-2.5">
-                    {breakdown.steps.map((step, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`flex justify-between items-start ${
-                          step.isTotal ? 'pt-3 border-t-2 border-green-300' : 
-                          step.isSubtotal ? 'pt-2 border-t border-green-200' : ''
-                        }`}
-                      >
-                        <span className={`text-sm ${
-                          step.isTotal ? 'font-bold text-gray-900 text-base' : 
-                          step.isSubtotal ? 'font-semibold text-gray-800' : 
-                          'text-gray-600'
-                        }`}>
-                          {step.label}
-                        </span>
-                        <div className="text-right">
-                          <div className={`${
-                            step.isTotal ? 'font-bold text-green-700 text-base' : 
-                            step.isSubtotal ? 'font-semibold text-green-700' : 
-                            'text-gray-700'
+                  
+                  {/* Drom.ru breakdown */}
+                  {showBreakdown && dromBreakdown && (
+                    <div className="mt-4 pt-4 border-t border-blue-200 space-y-2.5">
+                      {dromBreakdown.steps.map((step, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`flex justify-between items-start ${
+                            step.isTotal ? 'pt-3 border-t-2 border-blue-300' : 
+                            step.isSubtotal ? 'pt-2 border-t border-blue-200' : ''
+                          }`}
+                        >
+                          <span className={`text-sm ${
+                            step.isTotal ? 'font-bold text-gray-900 text-base' : 
+                            step.isSubtotal ? 'font-semibold text-gray-800' : 
+                            'text-gray-600'
                           }`}>
-                            {step.value}
-                            {step.hasAsterisk && <sup className="text-xs">*</sup>}
-                          </div>
-                          {step.subValues && Array.isArray(step.subValues) ? (
-                            <div className="text-xs text-gray-500 mt-0.5 space-y-0.5">
-                              {step.subValues.map((subVal, subIdx) => (
-                                <div key={subIdx}>{subVal}</div>
-                              ))}
+                            {step.label}
+                          </span>
+                          <div className="text-right">
+                            <div className={`${
+                              step.isTotal ? 'font-bold text-blue-700 text-base' : 
+                              step.isSubtotal ? 'font-semibold text-blue-700' : 
+                              'text-gray-700'
+                            }`}>
+                              {step.value}
+                              {step.hasAsterisk && <sup className="text-xs">*</sup>}
                             </div>
-                          ) : step.subValue && (
-                            <div className="text-xs text-gray-500 mt-0.5">{step.subValue}</div>
-                          )}
+                            {step.subValues && Array.isArray(step.subValues) ? (
+                              <div className="text-xs text-gray-500 mt-0.5 space-y-0.5">
+                                {step.subValues.map((subVal, subIdx) => (
+                                  <div key={subIdx}>{subVal}</div>
+                                ))}
+                              </div>
+                            ) : step.subValue && (
+                              <div className="text-xs text-gray-500 mt-0.5">{step.subValue}</div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    <div className="text-xs text-gray-500 mt-3 pt-3 border-t border-green-200 space-y-1">
-                      <div>Курс CNY: 1 ¥ = {breakdown.rateCny.toFixed(2)} ₽</div>
-                      <div>Курс EUR: 1 € = {breakdown.rateEur.toFixed(2)} ₽</div>
-                      <div className="mt-3 pt-3 border-t border-green-200 italic text-gray-600">
-                        *Цена является ориентировочной и зависит от курсов валюты, точной даты выпуска и иных факторов. Цена не является публичной офертой.
-                      </div>
+                      ))}
+                      {dromBreakdown.rateCny && dromBreakdown.rateEur && (
+                        <div className="text-xs text-gray-500 mt-3 pt-3 border-t border-blue-200 space-y-1">
+                          <div>Курс CNY: 1 ¥ = {dromBreakdown.rateCny.toFixed(2)} ₽</div>
+                          <div>Курс EUR: 1 € = {dromBreakdown.rateEur.toFixed(2)} ₽</div>
+                          <div className="mt-3 pt-3 border-t border-blue-200 italic text-gray-600">
+                            *Цена является ориентировочной и зависит от курсов валюты, точной даты выпуска и иных факторов. Цена не является публичной офертой.
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Specifications */}
               <div className="space-y-3">

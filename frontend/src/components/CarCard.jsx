@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { calculateFullPrice } from '../lib/currency';
 import { apiFuelTypeToCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName } from '../lib/brandMapping';
 import OptimizedImage from './OptimizedImage';
+import { formatDromPriceBreakdown } from '../lib/currency';
 
 /**
  * Car card component - displays single car listing
@@ -17,22 +17,10 @@ export default function CarCard({ car, exchangeRates }) {
   // Get display brand name
   const displayBrandName = getDisplayBrandName(car.brandname);
 
-  // Calculate full price with all fees (old calculation)
-  const priceData = calculateFullPrice(
-    car.price_cny, 
-    exchangeRates.CNY, 
-    {
-      import_duty: car.import_duty,
-      customs_fee_rub: car.customs_fee_rub,
-      recycling_fee_rub: car.recycling_fee_rub
-    },
-    exchangeRates.EUR,
-    car // Передаём объект для валидации пошлины
-  );
-  
   // Get new price from drom.ru API calculation (if available)
-  const dromPrice = car.drom_price_calculation?.totalPrice;
-  const dromPriceValue = dromPrice?.value ? parseInt(dromPrice.value) : null;
+  const dromDetails = car.drom_price_calculation?.details;
+  const dromBreakdown = dromDetails ? formatDromPriceBreakdown(dromDetails, null, exchangeRates) : null;
+  const dromPriceValue = dromBreakdown?.total || null;
   const dromPriceFormatted = dromPriceValue 
     ? `${(dromPriceValue / 1000000).toFixed(2)} млн ₽`
     : null;
@@ -77,28 +65,16 @@ export default function CarCard({ car, exchangeRates }) {
         </h3>
         
         {/* Price - prominent */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg px-4 py-3 mb-3">
-          <div className="text-xs text-gray-600 mb-1">Примерная стоимость в России</div>
-          
-          {/* New price from drom.ru API (if available) */}
-          {dromPriceFormatted ? (
-            <div className="space-y-1">
-              <div className="flex items-baseline gap-2">
-                <div className="text-3xl font-extrabold text-green-600">
-                  {dromPriceFormatted}
-                </div>
-                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">drom.ru</span>
-              </div>
-              <div className="text-sm text-gray-500 line-through">
-                Старая: ~{priceData.totalFormatted}
+        {dromPriceFormatted && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg px-4 py-3 mb-3">
+            <div className="text-xs text-gray-600 mb-1">Расчетная стоимость в России</div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-3xl font-extrabold text-blue-600">
+                {dromPriceFormatted}
               </div>
             </div>
-          ) : (
-            <div className="text-3xl font-extrabold text-green-600">
-              ~{priceData.totalFormatted}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
         
         {/* Specs grid */}
         <div className="grid grid-cols-2 gap-2 text-sm">
