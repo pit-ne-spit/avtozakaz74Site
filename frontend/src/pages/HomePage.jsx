@@ -6,7 +6,7 @@ import CarCard from '../components/CarCard';
 import Pagination from '../components/Pagination';
 import SortSelector from '../components/SortSelector';
 import { fetchCars } from '../lib/api';
-import { getDisplayBrandName, getApiBrandName, getApiModelName } from '../lib/brandMapping';
+import { getDisplayBrandName, getApiBrandName, getApiModelName, getDisplayModelName } from '../lib/brandMapping';
 import SEOHead, { createWebSiteStructuredData, createOrganizationStructuredData } from '../components/SEOHead';
 import HeroContent from '../components/HeroContent';
 import FAQ from '../components/FAQ';
@@ -263,7 +263,12 @@ export default function HomePage() {
       
       // Get models for this brand from reference
       const brandModels = modelsReference[apiBrand] || [];
-      brandModels.forEach(model => allModels.add(model));
+      // Apply display model name mapping (e.g., Tuyue -> Tharu, Tanyue -> Tayron)
+      // This ensures users see correct names even if reference was generated before mapping was added
+      brandModels.forEach(model => {
+        const displayModelName = getDisplayModelName(model);
+        allModels.add(displayModelName);
+      });
     });
     
     // Convert to sorted array

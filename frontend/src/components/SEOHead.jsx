@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { getDisplayBrandName, getDisplayModelName } from '../lib/brandMapping';
 
 /**
  * SEO компонент для динамических мета-тегов
@@ -68,8 +69,10 @@ export default function SEOHead({
  * Хелпер для создания структурированных данных автомобиля
  */
 export function createCarStructuredData(car, carDetails) {
-  const brand = carDetails?.vehicle_info?.brandname || car?.brandname || '';
-  const model = carDetails?.vehicle_info?.seriesname || car?.seriesname || '';
+  const apiBrandName = carDetails?.vehicle_info?.brandname || car?.brandname || '';
+  const apiModelName = carDetails?.vehicle_info?.seriesname || car?.seriesname || '';
+  const brand = getDisplayBrandName(apiBrandName);
+  const model = getDisplayModelName(apiModelName);
   const year = carDetails?.vehicle_info?.firstregyear || car?.firstregyear || '';
   const price = car?.total_price_rub || 0;
   const image = car?.imageurl || carDetails?.media_support?.photos?.[0] || '';

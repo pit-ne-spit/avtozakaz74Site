@@ -282,6 +282,16 @@ export function getApiBrandList() {
 }
 
 /**
+ * Mapping of display model names to API model names
+ * Used to show user-friendly names while maintaining API compatibility
+ */
+const MODEL_NAME_MAPPING = {
+  // Volkswagen models
+  'Tharu': 'Tuyue',
+  'Tayron': 'Tanyue',
+};
+
+/**
  * Convert display model name back to API format
  * Reverses all normalizations done in normalize-models.js
  * 
@@ -291,26 +301,43 @@ export function getApiBrandList() {
  * - "A4L" -> "A4l" (capitalization - API expects lowercase suffix)
  * - "E-tron" -> "e-tron" (capitalization)
  * - "RS 3" -> "Rs 3" (capitalization - but keep uppercase for known prefixes)
+ * - Model name mappings (e.g., "Tharu" -> "Tuyue", "Tayron" -> "Tanyue")
  * 
  * Examples:
  * - "Jimny (Импорт)" -> "Jimny (Imported)"
  * - "A4L" -> "A4l"
  * - "Q5L" -> "Q5l"
  * - "E-tron" -> "e-tron"
+ * - "Tharu" -> "Tuyue"
+ * - "Tharu New Energy" -> "Tuyue New Energy"
+ * - "Tayron" -> "Tanyue"
  * 
- * @param {string} displayModelName - Display model name (e.g., "Jimny (Импорт)", "A4L")
- * @returns {string} API model name (e.g., "Jimny (Imported)", "A4l")
+ * @param {string} displayModelName - Display model name (e.g., "Jimny (Импорт)", "A4L", "Tharu")
+ * @returns {string} API model name (e.g., "Jimny (Imported)", "A4l", "Tuyue")
  */
 export function getApiModelName(displayModelName) {
   if (!displayModelName) return '';
   
   let apiModelName = displayModelName;
   
-  // 1. Convert "(Импорт)" back to "(Imported)" - CRITICAL for API
+  // 1. Apply model name mappings first (before other transformations)
+  // Check if the model name starts with a mapped display name
+  for (const [displayName, apiName] of Object.entries(MODEL_NAME_MAPPING)) {
+    // Match exact name or name with additional words (e.g., "Tharu New Energy")
+    const regex = new RegExp(`^${displayName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`, 'i');
+    if (regex.test(apiModelName)) {
+      apiModelName = apiModelName.replace(regex, (match, space) => {
+        return apiName + space;
+      });
+      break; // Only apply first match
+    }
+  }
+  
+  // 2. Convert "(Импорт)" back to "(Imported)" - CRITICAL for API
   // The 'g' flag ensures ALL occurrences are replaced
   apiModelName = apiModelName.replace(/\(Импорт\)/g, '(Imported)');
   
-  // 2. Reverse capitalization of model suffixes (A4L -> A4l, Q5L -> Q5l)
+  // 3. Reverse capitalization of model suffixes (A4L -> A4l, Q5L -> Q5l)
   // Pattern: uppercase letter + digits + uppercase letter at end -> lowercase last letter
   // This matches patterns like A4L, Q5L, X3L, etc.
   apiModelName = apiModelName.replace(/([A-Z]\d+)([A-Z])(\s|$|\))/g, (match, prefix, letter, suffix) => {
@@ -321,11 +348,68 @@ export function getApiModelName(displayModelName) {
     return match;
   });
   
-  // 3. Reverse E-tron -> e-tron (API expects lowercase)
+  // 4. Reverse E-tron -> e-tron (API expects lowercase)
   apiModelName = apiModelName.replace(/\bE-tron\b/g, 'e-tron');
   
   // Note: RS, GT, SQ prefixes are kept uppercase as API usually expects them that way
   // But if API expects lowercase, we can add: apiModelName = apiModelName.replace(/\bRS\s/g, 'Rs ');
   
   return apiModelName;
+}
+
+/**
+ * Convert API model name to display format
+ * Applies all normalizations and model name mappings
+ * 
+ * Examples:
+ * - "Jimny (Imported)" -> "Jimny (Импорт)"
+ * - "A4l" -> "A4L"
+ * - "e-tron" -> "E-tron"
+ * - "Tuyue" -> "Tharu"
+ * - "Tuyue New Energy" -> "Tharu New Energy"
+ * - "Tanyue" -> "Tayron"
+ * 
+ * @param {string} apiModelName - API model name (e.g., "Jimny (Imported)", "A4l", "Tuyue")
+ * @returns {string} Display model name (e.g., "Jimny (Импорт)", "A4L", "Tharu")
+ */
+export function getDisplayModelName(apiModelName) {
+  if (!apiModelName) return '';
+  
+  let displayModelName = apiModelName;
+  
+  // 1. Apply model name mappings (reverse of MODEL_NAME_MAPPING)
+  // Check if the model name starts with a mapped API name
+  for (const [displayName, apiName] of Object.entries(MODEL_NAME_MAPPING)) {
+    // Match exact name or name with additional words (e.g., "Tuyue New Energy")
+    const regex = new RegExp(`^${apiName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`, 'i');
+    if (regex.test(displayModelName)) {
+      displayModelName = displayModelName.replace(regex, (match, space) => {
+        return displayName + space;
+      });
+      break; // Only apply first match
+    }
+  }
+  
+  // 2. Translate "(Imported)" -> "(Импорт)"
+  displayModelName = displayModelName.replace(/\(Imported\)/gi, '(Импорт)');
+  
+  // 3. Fix capitalization of model suffixes (A4l -> A4L, Q5l -> Q5L)
+  displayModelName = displayModelName.replace(/([A-Z]\d+)([a-z])(\s|$|\))/g, (match, prefix, letter, suffix) => {
+    return prefix + letter.toUpperCase() + suffix;
+  });
+  
+  // 4. Fix E-tron capitalization
+  displayModelName = displayModelName.replace(/\be-tron\b/gi, 'E-tron');
+  displayModelName = displayModelName.replace(/\bE-TRON\b/g, 'E-tron');
+  
+  // 5. Fix RS/SQ/TT prefixes
+  displayModelName = displayModelName.replace(/\bRs\s/g, 'RS ');
+  displayModelName = displayModelName.replace(/\bSq\s/g, 'SQ ');
+  displayModelName = displayModelName.replace(/\bTt\s/g, 'TT ');
+  displayModelName = displayModelName.replace(/\bTts\b/g, 'TTS');
+  
+  // 6. Remove extra spaces
+  displayModelName = displayModelName.replace(/\s+/g, ' ').trim();
+  
+  return displayModelName;
 }

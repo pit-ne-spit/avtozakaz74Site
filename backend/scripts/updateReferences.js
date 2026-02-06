@@ -131,30 +131,53 @@ async function fetchModelsForBrand(brandName) {
 }
 
 /**
+ * Маппинг названий моделей для отображения пользователю
+ * Ключ - название из API, значение - отображаемое название
+ */
+const MODEL_NAME_MAPPING = {
+  // Volkswagen models
+  'Tuyue': 'Tharu',
+  'Tanyue': 'Tayron',
+};
+
+/**
  * Нормализовать название модели
  */
 function normalizeModelName(modelName) {
   let normalized = modelName;
   
-  // 1. Перевод (Imported) → (Импорт)
+  // 1. Применить маппинг названий моделей (например, Tuyue -> Tharu)
+  // Проверяем, начинается ли название модели с маппированного API названия
+  for (const [apiName, displayName] of Object.entries(MODEL_NAME_MAPPING)) {
+    // Сопоставляем точное название или название с дополнительными словами (например, "Tuyue New Energy")
+    const regex = new RegExp(`^${apiName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`, 'i');
+    if (regex.test(normalized)) {
+      normalized = normalized.replace(regex, (match, space) => {
+        return displayName + space;
+      });
+      break; // Применяем только первое совпадение
+    }
+  }
+  
+  // 2. Перевод (Imported) → (Импорт)
   normalized = normalized.replace(/\(Imported\)/gi, '(Импорт)');
   
-  // 2. Исправить регистр суффиксов (A4l → A4L, Q5l → Q5L)
+  // 3. Исправить регистр суффиксов (A4l → A4L, Q5l → Q5L)
   normalized = normalized.replace(/([A-Z]\d+)([a-z])(\s|$)/g, (match, prefix, letter, suffix) => {
     return prefix + letter.toUpperCase() + suffix;
   });
   
-  // 3. E-tron
+  // 4. E-tron
   normalized = normalized.replace(/\be-tron\b/gi, 'E-tron');
   normalized = normalized.replace(/\bE-TRON\b/g, 'E-tron');
   
-  // 4. RS/SQ/TT
+  // 5. RS/SQ/TT
   normalized = normalized.replace(/\bRs\s/g, 'RS ');
   normalized = normalized.replace(/\bSq\s/g, 'SQ ');
   normalized = normalized.replace(/\bTt\s/g, 'TT ');
   normalized = normalized.replace(/\bTts\b/g, 'TTS');
   
-  // 5. Убрать лишние пробелы
+  // 6. Убрать лишние пробелы
   normalized = normalized.replace(/\s+/g, ' ').trim();
   
   return normalized;

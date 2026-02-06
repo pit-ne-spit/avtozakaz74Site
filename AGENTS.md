@@ -31,7 +31,10 @@ No linting, testing, or type-checking is configured in this project.
 
 ### API Integration Pattern
 
-**Critical**: This app uses **external API** (https://api-centr.ru/che168/) through Vite's development proxy. The proxy configuration in `vite.config.js` rewrites `/api/*` to `/che168/*` on the external server.
+**Critical**: This app uses **external API** (https://api-centr.ru/che168/) through backend proxy server:
+- **Development**: Vite proxy in `vite.config.js` rewrites `/api/*` to `http://localhost:3000/api/*` (backend)
+- **Production**: Nginx proxy rewrites `/api/*` to `http://backend:3000/api/*` (Docker container)
+- Backend proxy (`backend/server.js`) adds API token and forwards requests to external API
 
 #### Filter Transformation
 The API expects a specific format that differs from the UI state:
@@ -89,18 +92,22 @@ Uses **Tailwind CSS** with utility classes. No custom CSS modules or styled-comp
 
 ## API Authentication
 
-**Security Note**: API token is hardcoded in `frontend/src/lib/api.js` as `const API_TOKEN`. This is temporary for development. For production:
-- Move token to environment variable
-- Add backend proxy instead of direct API calls
-- Never commit real tokens to public repositories
+**Security**: API token is stored securely on the backend server:
+- Token is stored in `backend/.env` file (never committed to git)
+- Frontend makes requests to `/api/*` endpoints without token
+- Backend proxy (`backend/server.js`) adds token to requests before forwarding to external API
+- Token format: `che168-XXXXXXXXXXXXX` in Authorization header
 
-Current token format: `che168-XXXXXXXXXXXXX` in Authorization header.
+**Development**: For local development, ensure `backend/.env` exists with `API_TOKEN=your-token-here`
 
 ## Key Files to Understand
 
 - `frontend/src/lib/api.js` - **API client**: Contains all API interaction logic and filter transformation
-- `frontend/src/App.jsx` - **Main orchestrator**: State, pagination, filter handling
-- `frontend/vite.config.js` - **Proxy configuration**: Maps `/api/*` to external API
+- `frontend/src/lib/brandMapping.js` - **Brand/Model mapping**: Converts between API and display names
+- `frontend/src/pages/HomePage.jsx` - **Main orchestrator**: State, pagination, filter handling
+- `frontend/vite.config.js` - **Proxy configuration**: Maps `/api/*` to backend in development
+- `backend/server.js` - **Backend proxy**: Adds API token and forwards requests to external API
+- `backend/scripts/updateReferences.js` - **Reference generator**: Creates brand/model reference files
 - `api_specification.json` - **OpenAPI spec**: Full API documentation
 
 ## Common Patterns
@@ -113,11 +120,12 @@ Current token format: `che168-XXXXXXXXXXXXX` in Authorization header.
 5. For dynamic options: Use `fetchAvailableFilters()` in useEffect hook
 
 ### Dynamic Filters
-Brands and models are loaded dynamically from API:
-- `brands` - Loaded on component mount from `/che168/getAvailableFilters`
-- `models` - Loaded when brand changes, filtered by selected brand
+Brands and models are loaded from backend reference API:
+- `brands` - Loaded on component mount from `/api/brands` (backend reference)
+- `models` - Loaded when brand changes from `/api/models` (backend reference), filtered by selected brand
 - Model filter resets automatically when brand changes
 - Loading states shown in dropdowns during fetch
+- Model names are mapped using `getDisplayModelName()` when displayed to users
 
 ### Working with Car Data
 Always use the correct field names:
@@ -125,6 +133,31 @@ Always use the correct field names:
 - `car.brandname` (not `car.brand`)
 - `car.seriesname` (not `car.model`)
 - `car.imageurl` (not `car.photos[0]`)
+
+### Brand and Model Name Mapping
+The app uses name mapping to display user-friendly names while maintaining API compatibility:
+
+**Brand Mapping** (`frontend/src/lib/brandMapping.js`):
+- `getDisplayBrandName(apiBrandName)` - Converts API brand name to display name
+- `getApiBrandName(displayName)` - Converts display name back to API format
+- Example: API returns "Harvard" → User sees "Haval"
+
+**Model Name Mapping** (`frontend/src/lib/brandMapping.js`):
+- `getDisplayModelName(apiModelName)` - Converts API model name to display name
+- `getApiModelName(displayModelName)` - Converts display name back to API format
+- Examples:
+  - API returns "Tuyue" → User sees "Tharu"
+  - API returns "Tanyue" → User sees "Tayron"
+  - API returns "A4l" → User sees "A4L"
+  - API returns "Jimny (Imported)" → User sees "Jimny (Импорт)"
+
+**Important**: When displaying model names to users, always use `getDisplayModelName()`. When sending model names to API, always use `getApiModelName()`.
+
+The mapping is applied:
+1. When loading models from reference in filters (HomePage.jsx)
+2. When displaying car cards (CarCard.jsx)
+3. When displaying car details (CarDetailsPage.jsx)
+4. When generating reference files (backend/scripts/updateReferences.js)
 
 ### Price Display
 Prices come **pre-calculated** from API in `total_price_rub` field. The `currency.js` utility just formats them - it doesn't calculate. API provides:

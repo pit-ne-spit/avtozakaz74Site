@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { apiFuelTypeToCategory } from '../lib/fuelTypes';
-import { getDisplayBrandName } from '../lib/brandMapping';
+import { getDisplayBrandName, getDisplayModelName } from '../lib/brandMapping';
 import OptimizedImage from './OptimizedImage';
 import { formatDromPriceBreakdown } from '../lib/currency';
 
@@ -16,6 +16,8 @@ export default function CarCard({ car, exchangeRates }) {
   
   // Get display brand name
   const displayBrandName = getDisplayBrandName(car.brandname);
+  // Get display model name
+  const displayModelName = getDisplayModelName(car.seriesname || '');
 
   // Get new price from drom.ru API calculation (if available)
   const dromDetails = car.drom_price_calculation?.details;
@@ -45,7 +47,7 @@ export default function CarCard({ car, exchangeRates }) {
       <div className="relative overflow-hidden">
         <OptimizedImage
           src={imageUrl}
-          alt={car.carname || `${displayBrandName} ${car.seriesname}`}
+          alt={car.carname || `${displayBrandName} ${displayModelName}`}
           className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           lazy={true}
@@ -61,7 +63,7 @@ export default function CarCard({ car, exchangeRates }) {
       <div className="p-4">
         {/* Car name */}
         <h3 className="text-lg font-bold text-gray-800 mb-2 truncate group-hover:text-blue-700 transition-colors">
-          {car.carname || `${displayBrandName} ${car.seriesname}`}
+          {car.carname || `${displayBrandName} ${displayModelName}`}
         </h3>
         
         {/* Price - prominent */}

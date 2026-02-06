@@ -5,7 +5,7 @@ import { fetchCars, fetchCarById } from '../lib/api';
 import { calculateFullPrice, formatPriceBreakdown, formatDromPriceBreakdown } from '../lib/currency';
 import { translateColor } from '../lib/colorTranslations';
 import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
-import { getDisplayBrandName } from '../lib/brandMapping';
+import { getDisplayBrandName, getDisplayModelName } from '../lib/brandMapping';
 import SEOHead, { createCarStructuredData } from '../components/SEOHead';
 import Breadcrumbs from '../components/Breadcrumbs';
 import SimilarCars from '../components/SimilarCars';
@@ -147,10 +147,13 @@ export default function CarDetailsPage() {
   
   // Get display brand name
   const displayBrandName = getDisplayBrandName(car?.brandname || carDetails?.vehicle_info?.brandname);
+  // Get display model name
+  const apiModelName = carDetails?.vehicle_info?.seriesname || car?.seriesname || '';
+  const displayModelName = getDisplayModelName(apiModelName);
 
   // SEO данные для карточки автомобиля
   const brand = displayBrandName;
-  const model = carDetails?.vehicle_info?.seriesname || car?.seriesname || '';
+  const model = displayModelName;
   const year = carDetails?.vehicle_info?.firstregyear || car?.firstregyear || '';
   const mileage = carDetails?.vehicle_info?.mileage 
     ? carDetails.vehicle_info.mileage * 10000 
@@ -405,7 +408,7 @@ export default function CarDetailsPage() {
               {/* Header */}
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {carDetails.vehicle_info?.carname || car.carname || `${displayBrandName} ${car.seriesname}`}
+                  {carDetails.vehicle_info?.carname || car.carname || `${displayBrandName} ${displayModelName}`}
                 </h1>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
