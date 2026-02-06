@@ -27,9 +27,9 @@ export default function FilterPresets({ onApplyPreset }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
-      description: 'До 160 л.с.',
+      description: 'До 159 л.с.',
       filters: {
-        power_to: 160,
+        power_to: 159,
       }
     },
     {
