@@ -113,8 +113,6 @@ function transformFiltersToApiFormat(params) {
 export async function fetchCars(params = {}) {
   const requestBody = transformFiltersToApiFormat(params);
   
-  console.log('Fetching cars with body:', requestBody);
-  
   const res = await fetch('/api/search_car', {
     method: 'POST',
     headers: {
@@ -126,12 +124,10 @@ export async function fetchCars(params = {}) {
   
   if (!res.ok) {
     const errorText = await res.text();
-    console.error('API Error:', res.status, errorText);
     throw new Error(`Ошибка API: ${res.status} ${res.statusText}`);
   }
   
   const data = await res.json();
-  console.log('API Response:', data);
   
   // Transform response to expected format
   if (data.status === 'success' && data.data) {
@@ -152,8 +148,6 @@ export async function fetchCars(params = {}) {
  * @returns {Promise<Object>} Car details with all information
  */
 export async function fetchCarById(carId) {
-  console.log('Fetching car details for infoid:', carId);
-  
   const res = await fetch('/api/get_car_info', {
     method: 'POST',
     headers: {
@@ -165,12 +159,10 @@ export async function fetchCarById(carId) {
   
   if (!res.ok) {
     const errorText = await res.text();
-    console.error('API Error:', res.status, errorText);
     throw new Error(`Ошибка API: ${res.status} ${res.statusText}`);
   }
   
   const data = await res.json();
-  console.log('Car details:', data);
   
   if (data.status === 'success' && data.data) {
     return data.data.extracted_data || data.data;
@@ -188,8 +180,6 @@ export async function fetchCarById(carId) {
  * @returns {Promise<Array>} Array of available values
  */
 export async function fetchAvailableFilters(fieldName, filters = {}, limit = 100, offset = 0) {
-  console.log(`Fetching available filters for ${fieldName}`);
-  
   const requestBody = {
     fields_to_extract: fieldName,
     limit: limit,
@@ -212,12 +202,10 @@ export async function fetchAvailableFilters(fieldName, filters = {}, limit = 100
   
   if (!res.ok) {
     const errorText = await res.text();
-    console.error('API Error:', res.status, errorText);
     throw new Error(`Ошибка API: ${res.status} ${res.statusText}`);
   }
   
   const data = await res.json();
-  console.log('Available filters response:', data);
   
   if (data.status === 'success' && data.data && data.data.data) {
     return data.data.data.values || [];

@@ -26,15 +26,6 @@ export default function CarCard({ car, exchangeRates }) {
   const dromPriceFormatted = dromPriceValue 
     ? `${(dromPriceValue / 1000000).toFixed(2)} млн ₽`
     : null;
-  
-  // Debug: логирование для проверки данных
-  if (car.infoid && (dromPriceFormatted || car.drom_price_calculation)) {
-    console.log(`[CarCard] Car ${car.infoid}:`, {
-      hasDromCalculation: !!car.drom_price_calculation,
-      dromPriceFormatted,
-      dromPriceValue
-    });
-  }
 
   return (
     <Link

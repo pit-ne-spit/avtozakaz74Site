@@ -9,9 +9,6 @@ import cron from 'node-cron';
 import { generateReferences } from './scripts/updateReferences.js';
 import { calculatePriceWithDrom } from './scripts/dromPriceCalculator.js';
 
-// Debug: проверка импорта
-console.log('[Backend] Drom price calculator imported:', typeof calculatePriceWithDrom);
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -36,8 +33,6 @@ app.get('/health', (req, res) => {
 // Proxy endpoint for search_car with drom.ru price calculation
 app.post('/api/search_car', async (req, res) => {
   try {
-    console.log('Proxying search_car request');
-    
     const response = await fetch(`${CHE168_API_URL}/search_car`, {
       method: 'POST',
       headers: {
@@ -51,21 +46,11 @@ app.post('/api/search_car', async (req, res) => {
     const data = await response.json();
     
     if (!response.ok) {
-      console.error('API Error:', response.status, data);
       return res.status(response.status).json(data);
     }
-
-    // Debug: проверка структуры данных
-    console.log(`[Price Calculation] Data status:`, data.status);
-    console.log(`[Price Calculation] Has cars:`, !!data.data?.cars);
-    console.log(`[Price Calculation] Cars is array:`, Array.isArray(data.data?.cars));
-    console.log(`[Price Calculation] Has rates:`, !!data.data?.rates);
-    console.log(`[Price Calculation] Rates:`, data.data?.rates);
     
     // If we have cars and rates, calculate prices using drom.ru API
     if (data.status === 'success' && data.data?.cars && Array.isArray(data.data.cars) && data.data.rates) {
-      console.log(`[Price Calculation] Processing ${data.data.cars.length} cars with drom.ru API`);
-      console.log(`[Price Calculation] First car sample:`, JSON.stringify(data.data.cars[0], null, 2));
       
       const rates = data.data.rates;
       const originalCars = [...data.data.cars]; // Save original array
@@ -98,30 +83,13 @@ app.post('/api/search_car', async (req, res) => {
           return result.value;
         } else {
           // If calculation failed, return original car
-          console.error(`[Price Calculation] Failed for car ${originalCars[index]?.infoid}:`, result.reason?.message || result.reason);
           return originalCars[index] || {};
         }
       });
-      
-      const successCount = carsWithPrices.filter(r => r.status === 'fulfilled' && r.value?.drom_price_calculation).length;
-      console.log(`[Price Calculation] Completed: ${successCount}/${data.data.cars.length} cars calculated successfully`);
-      
-      // Debug: показать пример обогащенного автомобиля
-      if (successCount > 0) {
-        const enrichedCar = data.data.cars.find(c => c.drom_price_calculation);
-        if (enrichedCar) {
-          console.log(`[Price Calculation] Sample enriched car:`, {
-            infoid: enrichedCar.infoid,
-            hasDromCalculation: !!enrichedCar.drom_price_calculation,
-            totalPrice: enrichedCar.drom_price_calculation?.totalPrice
-          });
-        }
-      }
     }
 
     res.json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Internal server error' 
@@ -132,8 +100,6 @@ app.post('/api/search_car', async (req, res) => {
 // Proxy endpoint for get_car_info
 app.post('/api/get_car_info', async (req, res) => {
   try {
-    console.log('Proxying get_car_info request for infoid:', req.body.infoid);
-    
     const response = await fetch(`${CHE168_API_URL}/get_car_info`, {
       method: 'POST',
       headers: {
@@ -147,13 +113,11 @@ app.post('/api/get_car_info', async (req, res) => {
     const data = await response.json();
     
     if (!response.ok) {
-      console.error('API Error:', response.status, data);
       return res.status(response.status).json(data);
     }
 
     res.json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Internal server error' 
@@ -164,8 +128,6 @@ app.post('/api/get_car_info', async (req, res) => {
 // Proxy endpoint for getAvailableFilters
 app.post('/api/getAvailableFilters', async (req, res) => {
   try {
-    console.log('Proxying getAvailableFilters request');
-    
     const response = await fetch(`${CHE168_API_URL}/getAvailableFilters`, {
       method: 'POST',
       headers: {
@@ -179,13 +141,11 @@ app.post('/api/getAvailableFilters', async (req, res) => {
     const data = await response.json();
     
     if (!response.ok) {
-      console.error('API Error:', response.status, data);
       return res.status(response.status).json(data);
     }
 
     res.json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Internal server error' 
@@ -200,7 +160,6 @@ app.get('/api/brands', async (req, res) => {
     const data = await fs.readFile(brandsPath, 'utf-8');
     res.json(JSON.parse(data));
   } catch (error) {
-    console.error('Error reading brands:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Failed to load brands reference' 
@@ -215,7 +174,6 @@ app.get('/api/models', async (req, res) => {
     const data = await fs.readFile(modelsPath, 'utf-8');
     res.json(JSON.parse(data));
   } catch (error) {
-    console.error('Error reading models:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Failed to load models reference' 
@@ -230,7 +188,6 @@ app.get('/api/references/metadata', async (req, res) => {
     const data = await fs.readFile(metadataPath, 'utf-8');
     res.json(JSON.parse(data));
   } catch (error) {
-    console.error('Error reading metadata:', error);
     res.status(404).json({ 
       status: 'error', 
       message: 'No metadata found' 
@@ -241,8 +198,6 @@ app.get('/api/references/metadata', async (req, res) => {
 // Generate sitemap.xml
 app.get('/api/sitemap', async (req, res) => {
   try {
-    console.log('Generating sitemap.xml...');
-    
     const SITE_URL = 'https://avtozakaz74.ru';
     const today = new Date().toISOString().split('T')[0];
     
@@ -273,7 +228,6 @@ app.get('/api/sitemap', async (req, res) => {
     const data = await response.json();
     
     if (!response.ok || data.status !== 'success') {
-      console.error('API Error generating sitemap:', response.status, data);
       // Возвращаем базовый sitemap с главной и статическими страницами
       const basicSitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -309,8 +263,6 @@ app.get('/api/sitemap', async (req, res) => {
 
     const cars = data.data?.cars || [];
     const totalCars = data.data?.count?.filtered || 0;
-    
-    console.log(`Found ${cars.length} cars (total: ${totalCars}) for sitemap`);
     
     // Генерируем XML sitemap
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -362,19 +314,10 @@ app.get('/api/sitemap', async (req, res) => {
 
     sitemap += `</urlset>`;
     
-    // Если автомобилей больше, чем мы получили, можно добавить примечание
-    if (totalCars > maxCars) {
-      console.warn(`Warning: Total cars (${totalCars}) exceeds sitemap limit (${maxCars}). Only first ${maxCars} cars included.`);
-    }
-    
     res.setHeader('Content-Type', 'application/xml');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Кеш на 1 час
     res.send(sitemap);
-    
-    console.log(`Sitemap generated successfully with ${cars.length + 1} URLs`);
   } catch (error) {
-    console.error('Error generating sitemap:', error);
-    
     // Возвращаем базовый sitemap в случае ошибки
     const SITE_URL = 'https://avtozakaz74.ru';
     const today = new Date().toISOString().split('T')[0];
@@ -396,15 +339,13 @@ app.get('/api/sitemap', async (req, res) => {
 // Trigger manual update of references (admin only)
 app.post('/api/references/update', async (req, res) => {
   try {
-    console.log('Manual references update triggered');
-    
     // Запустить обновление в фоне
     generateReferences()
-      .then(metadata => {
-        console.log('References updated successfully:', metadata);
+      .then(() => {
+        // Update completed
       })
-      .catch(error => {
-        console.error('Failed to update references:', error);
+      .catch(() => {
+        // Update failed
       });
     
     res.json({ 
@@ -412,7 +353,6 @@ app.post('/api/references/update', async (req, res) => {
       message: 'Update started in background' 
     });
   } catch (error) {
-    console.error('Error triggering update:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Failed to trigger update' 
@@ -430,20 +370,15 @@ app.use((req, res) => {
 
 // Запланированное обновление справочников (ежедневно в 3:00)
 cron.schedule('0 3 * * *', async () => {
-  console.log('[CRON] Starting scheduled references update...');
   try {
-    const metadata = await generateReferences();
-    console.log('[CRON] References updated successfully:', metadata);
+    await generateReferences();
   } catch (error) {
-    console.error('[CRON] Failed to update references:', error.message);
+    // Update failed silently
   }
 }, {
   timezone: 'Europe/Moscow'
 });
 
-console.log('Cron job scheduled: daily at 3:00 AM Moscow time');
-
 app.listen(PORT, () => {
-  console.log(`Backend proxy server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
+  // Server started
 });

@@ -6,7 +6,8 @@ import { calculateFullPrice, formatPriceBreakdown, formatDromPriceBreakdown } fr
 import { translateColor } from '../lib/colorTranslations';
 import { apiFuelTypeToDetailedCategory } from '../lib/fuelTypes';
 import { getDisplayBrandName, getDisplayModelName } from '../lib/brandMapping';
-import SEOHead, { createCarStructuredData } from '../components/SEOHead';
+import SEOHead from '../components/SEOHead';
+import { createCarStructuredData } from '../lib/structuredData';
 import Breadcrumbs from '../components/Breadcrumbs';
 import SimilarCars from '../components/SimilarCars';
 import OptimizedImage from '../components/OptimizedImage';
@@ -53,7 +54,6 @@ export default function CarDetailsPage() {
         setCarDetails(details);
         
       } catch (err) {
-        console.error('Error loading car:', err);
         setError(err.message || 'Ошибка при загрузке данных');
       } finally {
         setLoading(false);
@@ -110,15 +110,6 @@ export default function CarDetailsPage() {
     ? `${(dromPriceValue / 1000000).toFixed(2)} млн ₽`
     : null;
   
-  // Debug: логирование для проверки данных
-  if (car?.infoid) {
-    console.log(`[CarDetailsPage] Car ${car.infoid}:`, {
-      hasDromCalculation: !!dromCalculation,
-      dromPriceFormatted,
-      dromPriceValue,
-      dromDetails: dromDetails ? Object.keys(dromDetails) : null
-    });
-  }
   
   // Translate color from get_car_info API
   const colorRu = carDetails?.vehicle_info?.colorname ? translateColor(carDetails.vehicle_info.colorname) : '';

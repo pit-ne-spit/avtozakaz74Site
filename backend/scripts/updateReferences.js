@@ -24,11 +24,10 @@ const DELAY_MS = 500;
 const LIMIT = 50;
 
 /**
- * Логирование с timestamp
+ * Логирование с timestamp (отключено для production)
  */
 function log(message, level = 'INFO') {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] [${level}] ${message}`);
+  // Logging disabled
 }
 
 /**
@@ -273,7 +272,6 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}`) {
     })
     .catch(error => {
       log(`Скрипт завершён с ошибкой: ${error.message}`, 'ERROR');
-      console.error(error);
       process.exit(1);
     });
 }

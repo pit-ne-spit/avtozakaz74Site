@@ -156,13 +156,6 @@ export function validateAndRecalculateImportDuty(car, rates) {
   const tolerance = Math.max(apiValue * 0.05, 100); // 5% or 100 EUR
   
   if (difference > tolerance) {
-    console.warn(
-      `⚠️ Import duty mismatch for car ${car.infoid}:`,
-      `API: ${apiValue.toFixed(2)} EUR,`,
-      `Calculated: ${calculated.toFixed(2)} EUR,`,
-      `Difference: ${difference.toFixed(2)} EUR`
-    );
-    
     return {
       import_duty_eur: calculated,
       recalculated: true,

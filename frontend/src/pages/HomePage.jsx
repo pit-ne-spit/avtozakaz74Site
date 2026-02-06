@@ -7,7 +7,8 @@ import Pagination from '../components/Pagination';
 import SortSelector from '../components/SortSelector';
 import { fetchCars } from '../lib/api';
 import { getDisplayBrandName, getApiBrandName, getApiModelName, getDisplayModelName } from '../lib/brandMapping';
-import SEOHead, { createWebSiteStructuredData, createOrganizationStructuredData } from '../components/SEOHead';
+import SEOHead from '../components/SEOHead';
+import { createWebSiteStructuredData, createOrganizationStructuredData } from '../lib/structuredData';
 import HeroContent from '../components/HeroContent';
 import FAQ from '../components/FAQ';
 import OptimizedBackground from '../components/OptimizedBackground';
@@ -192,7 +193,6 @@ export default function HomePage() {
         window.scrollTo(0, scrollPosition);
       });
     } catch (e) {
-      console.error('Error fetching cars:', e);
       setError(e.message || 'Ошибка при загрузке данных. Попробуйте еще раз.');
       setItems([]);
       setTotal(0);
@@ -227,7 +227,6 @@ export default function HomePage() {
         setModelsReference(modelsData);
         
       } catch (err) {
-        console.error('Error loading references from backend:', err);
         // Fallback: можно показать ошибку пользователю
       } finally {
         setLoadingBrands(false);
