@@ -1,7 +1,7 @@
 import { getDisplayBrandName, getDisplayModelName } from './brandMapping';
 
 /**
- * Хелпер для создания структурированных данных автомобиля
+ * ?????? ??? ???????? ????????????????? ?????? ??????????
  */
 export function createCarStructuredData(car, carDetails) {
   const apiBrandName = carDetails?.vehicle_info?.brandname || car?.brandname || '';
@@ -22,13 +22,13 @@ export function createCarStructuredData(car, carDetails) {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `${brand} ${model} ${year}`,
-    "description": `${brand} ${model} ${year} года, пробег ${mileage.toLocaleString('ru-RU')} км, ${fuelType}`,
+    "description": `${brand} ${model} ${year} ????, ?????? ${mileage.toLocaleString('ru-RU')} ??, ${fuelType}`,
     "image": image ? (image.startsWith('http') ? image : `https:${image}`) : '',
     "brand": {
       "@type": "Brand",
       "name": brand
     },
-    "category": "Автомобиль",
+    "category": "??????????",
     "offers": {
       "@type": "Offer",
       "url": url,
@@ -56,13 +56,13 @@ export function createCarStructuredData(car, carDetails) {
 }
 
 /**
- * Хелпер для создания структурированных данных организации
+ * ?????? ??? ???????? ????????????????? ?????? ???????????
  */
 export function createOrganizationStructuredData() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "АвтоЗаказ 74",
+    "name": "????????? 74",
     "url": "https://avtozakaz74.ru",
     "logo": "https://avtozakaz74.ru/logo.png",
     "contactPoint": {
@@ -79,13 +79,13 @@ export function createOrganizationStructuredData() {
 }
 
 /**
- * Хелпер для создания структурированных данных сайта с поиском
+ * ?????? ??? ???????? ????????????????? ?????? ????? ? ???????
  */
 export function createWebSiteStructuredData() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "АвтоЗаказ 74",
+    "name": "????????? 74",
     "url": "https://avtozakaz74.ru",
     "potentialAction": {
       "@type": "SearchAction",
