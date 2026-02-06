@@ -39,7 +39,7 @@ export default function NumericInputWithOptions({
       <input
         ref={inputRef}
         type="number"
-        className="select w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="select w-full h-12 md:h-[42px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsOpen(true)}
@@ -57,7 +57,7 @@ export default function NumericInputWithOptions({
               key={idx}
               type="button"
               onClick={() => handleSelect(opt)}
-              className={`w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors text-sm ${
+              className={`w-full px-4 py-3 md:py-2.5 text-left hover:bg-blue-50 transition-colors text-sm min-h-[48px] md:min-h-0 flex items-center ${
                 value == opt ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
               }`}
             >

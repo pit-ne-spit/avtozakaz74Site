@@ -361,11 +361,11 @@ export default function HomePage() {
       {/* Header */}
       <Header />
 
-      {/* Hero section with background and filters */}
+      {/* Hero section with background */}
       <OptimizedBackground
         src="/background.jpg"
         webpSrc="/background.webp"
-        className="h-[575px]"
+        className="h-[575px] md:h-[575px]"
         overlay={true}
       >
         {/* Filters over image */}
@@ -389,7 +389,7 @@ export default function HomePage() {
       </OptimizedBackground>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 pt-[36rem] md:pt-64 pb-6 space-y-6">
+      <main className="container mx-auto px-4 pt-[28rem] md:pt-64 pb-24 md:pb-6 space-y-6">
         
         {/* Error message */}
         {error && (
@@ -423,7 +423,8 @@ export default function HomePage() {
         {/* Results count and sorting */}
         {!loading && !error && (
           <>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4">
+            {/* Results count - только на desktop */}
+            <div className="hidden md:block bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/50 px-5 py-4 mt-8 md:mt-0">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-2">
@@ -440,7 +441,7 @@ export default function HomePage() {
                 </div>
               </div>
               
-              {/* Sort selector - теперь внутри блока результатов */}
+              {/* Sort selector - внутри блока результатов на desktop */}
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <SortSelector
                   sortBy={sortBy}
@@ -448,6 +449,15 @@ export default function HomePage() {
                   onChange={handleSortChange}
                 />
               </div>
+            </div>
+            
+            {/* Sort selector - отдельно на мобильных */}
+            <div className="md:hidden mt-6">
+              <SortSelector
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                onChange={handleSortChange}
+              />
             </div>
           </>
         )}

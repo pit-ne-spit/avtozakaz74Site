@@ -63,7 +63,7 @@ export default function SearchableSelect({
           }
         }}
         disabled={disabled || loading}
-        className={`select w-full flex items-center gap-2 h-[42px] ${
+        className={`select w-full flex items-center gap-2 h-12 md:h-[42px] ${
           disabled || loading ? 'opacity-60 cursor-not-allowed' : ''
         }`}
       >
@@ -124,7 +124,7 @@ export default function SearchableSelect({
             <button
               type="button"
               onClick={() => handleSelect('')}
-              className={`w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors text-sm ${
+              className={`w-full px-4 py-3 md:py-2.5 text-left hover:bg-blue-50 transition-colors text-sm min-h-[48px] md:min-h-0 flex items-center ${
                 !value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
               }`}
             >
@@ -138,7 +138,7 @@ export default function SearchableSelect({
                   key={option}
                   type="button"
                   onClick={() => handleSelect(option)}
-                  className={`w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors text-sm ${
+                  className={`w-full px-4 py-3 md:py-2.5 text-left hover:bg-blue-50 transition-colors text-sm min-h-[48px] md:min-h-0 flex items-center ${
                     value === option
                       ? 'bg-blue-50 text-blue-700 font-medium'
                       : 'text-gray-700'

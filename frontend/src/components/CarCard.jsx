@@ -106,7 +106,7 @@ export default function CarCard({ car, exchangeRates }) {
         </div>
 
         {/* View button */}
-        <div className="w-full mt-4 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-center">
+        <div className="w-full mt-4 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-semibold py-3 md:py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-center min-h-[48px] md:min-h-0 flex items-center justify-center touch-manipulation">
           Подробнее →
         </div>
       </div>

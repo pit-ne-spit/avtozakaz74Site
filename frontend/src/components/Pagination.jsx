@@ -61,7 +61,7 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
   return (
     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 bg-white rounded-xl shadow-md p-4">
       <button
-        className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+        className="px-5 py-3 md:py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2 min-h-[48px] md:min-h-0 touch-manipulation"
         onClick={(e) => goToPage(page - 1, e)}
         disabled={page <= 1}
       >
@@ -84,7 +84,7 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
           return (
             <button
               key={pageNum}
-              className={`min-w-[44px] h-11 rounded-lg font-semibold transition-all duration-200 ${
+              className={`min-w-[48px] md:min-w-[44px] h-12 md:h-11 rounded-lg font-semibold transition-all duration-200 touch-manipulation ${
                 pageNum === page
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md transform scale-110'
                   : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow'
@@ -98,7 +98,7 @@ export default function Pagination({ page, total, pageSize = 10, onChange }) {
       </div>
       
       <button
-        className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+        className="px-5 py-3 md:py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2 min-h-[48px] md:min-h-0 touch-manipulation"
         onClick={(e) => goToPage(page + 1, e)}
         disabled={page >= totalPages}
       >

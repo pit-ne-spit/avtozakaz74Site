@@ -77,7 +77,7 @@ export default function MultiSearchableSelect({
           }
         }}
         disabled={disabled || loading}
-        className={`select w-full flex items-start justify-between gap-2 min-h-[42px] ${
+        className={`select w-full flex items-start justify-between gap-2 min-h-12 md:min-h-[42px] ${
           disabled || loading ? 'opacity-60 cursor-not-allowed' : ''
         } ${selectedValues.length > 1 ? 'py-1.5' : ''}`}
       >
@@ -168,7 +168,7 @@ export default function MultiSearchableSelect({
               <button
                 type="button"
                 onClick={() => onChange([])}
-                className="w-full px-4 py-2.5 text-left bg-red-50 hover:bg-red-100 text-red-700 font-medium transition-colors text-sm border-b border-gray-100"
+                className="w-full px-4 py-3 md:py-2.5 text-left bg-red-50 hover:bg-red-100 text-red-700 font-medium transition-colors text-sm border-b border-gray-100 min-h-[48px] md:min-h-0 flex items-center"
               >
                 ✕ Очистить все
               </button>
@@ -183,7 +183,7 @@ export default function MultiSearchableSelect({
                     key={option}
                     type="button"
                     onClick={() => handleToggle(option)}
-                    className={`w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors text-sm flex items-center gap-2 ${
+                    className={`w-full px-4 py-3 md:py-2.5 text-left hover:bg-blue-50 transition-colors text-sm flex items-center gap-2 min-h-[48px] md:min-h-0 ${
                       isSelected
                         ? 'bg-blue-50 text-blue-700 font-medium'
                         : 'text-gray-700'

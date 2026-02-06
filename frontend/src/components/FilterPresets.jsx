@@ -69,22 +69,22 @@ export default function FilterPresets({ onApplyPreset }) {
         <span className="text-sm font-semibold text-gray-700">Быстрый выбор:</span>
       </div>
       
-      <div className="flex gap-3 flex-wrap mt-[200px] md:mt-0">
+      <div className="flex gap-2 md:gap-3 overflow-x-auto md:flex-wrap mt-0 pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
         {presets.map(preset => (
           <button
             key={preset.id}
             onClick={() => onApplyPreset(preset.filters)}
-            className="group bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-2 border-blue-200 hover:border-blue-400 rounded-lg px-4 py-3 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="group bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-2 border-blue-200 hover:border-blue-400 rounded-lg px-3 md:px-4 py-2.5 md:py-3 transition-all duration-200 shadow-sm hover:shadow-md touch-manipulation min-h-[48px] flex-shrink-0"
           >
-            <div className="flex items-center gap-3">
-              <div className="text-blue-600 group-hover:text-blue-700">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="text-blue-600 group-hover:text-blue-700 flex-shrink-0">
                 {preset.icon}
               </div>
-              <div className="text-left">
-                <div className="text-sm font-semibold text-gray-800 group-hover:text-blue-700">
+              <div className="text-left whitespace-nowrap">
+                <div className="text-xs md:text-sm font-semibold text-gray-800 group-hover:text-blue-700">
                   {preset.label}
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-[10px] md:text-xs text-gray-600">
                   {preset.description}
                 </div>
               </div>
