@@ -86,7 +86,6 @@ export function mapEngineType(fuelType) {
   }
   
   // Для остальных типов используем DIESEL_OR_GASOLINE по умолчанию
-  console.warn(`[Drom API] Unknown fuel type: ${fuelType}, using DIESEL_OR_GASOLINE`);
   return 'DIESEL_OR_GASOLINE';
 }
 
@@ -114,23 +113,8 @@ export function buildDromRequestParams(car, rates) {
   
   const engineHorsePower = convertKwToHorsepower(car.power_kw);
   
-  // Валидация и логирование для отладки
-  if (!vehicleAge) {
-    console.warn(`[Drom API] Warning: vehicleAge is null for car ${car.infoid}, using fallback`);
-  }
-  if (!engineHorsePower || engineHorsePower === 0) {
-    console.warn(`[Drom API] Warning: engineHorsePower is ${engineHorsePower} for car ${car.infoid}`);
-  }
-  if (!car.price_cny || car.price_cny === 0) {
-    console.warn(`[Drom API] Warning: price_cny is ${car.price_cny} for car ${car.infoid}`);
-  }
-  if (!car.engine_volume_ml || car.engine_volume_ml === 0) {
-    console.warn(`[Drom API] Warning: engine_volume_ml is ${car.engine_volume_ml} for car ${car.infoid}`);
-  }
-  
   // Проверка обязательных параметров
   if (!car.price_cny || car.price_cny <= 0) {
-    console.error(`[Drom API] Invalid price_cny: ${car.price_cny} for car ${car.infoid}`);
     return null;
   }
   
@@ -139,17 +123,14 @@ export function buildDromRequestParams(car, rates) {
   
   // Для электрических автомобилей engine_volume_ml может отсутствовать или быть 0
   if (!isElectric && (!car.engine_volume_ml || car.engine_volume_ml <= 0)) {
-    console.error(`[Drom API] Invalid engine_volume_ml: ${car.engine_volume_ml} for car ${car.infoid}`);
     return null;
   }
   
   if (!engineHorsePower || engineHorsePower <= 0) {
-    console.error(`[Drom API] Invalid engineHorsePower: ${engineHorsePower} for car ${car.infoid}`);
     return null;
   }
   
   if (!vehicleAge) {
-    console.error(`[Drom API] Invalid vehicleAge: ${vehicleAge} for car ${car.infoid}`);
     return null;
   }
   
@@ -195,17 +176,12 @@ export async function calculatePriceWithDrom(car, rates, timeout = 5000) {
     
     // Если buildDromRequestParams вернул null, значит параметры невалидны
     if (!params) {
-      console.error(`[Drom API] Cannot build params for car ${car.infoid} - missing required fields`);
       return null;
     }
     
     // Build query string
     const queryString = new URLSearchParams(params).toString();
     const url = `${DROM_API_URL}?${queryString}`;
-    
-    console.log(`[Drom API] Calculating price for car ${car.infoid}`);
-    console.log(`[Drom API] Request params:`, JSON.stringify(params, null, 2));
-    console.log(`[Drom API] Request URL:`, url);
     
     // Create abort controller for timeout
     const controller = new AbortController();
@@ -223,17 +199,12 @@ export async function calculatePriceWithDrom(car, rates, timeout = 5000) {
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[Drom API] Error ${response.status} for car ${car.infoid}`);
-        console.error(`[Drom API] Error response:`, errorText);
-        console.error(`[Drom API] Request that failed:`, url);
         return null;
       }
       
       const data = await response.json();
       
       if (data.result) {
-        console.log(`[Drom API] Success for car ${car.infoid}: totalPrice = ${data.result.totalPrice?.value} ${data.result.totalPrice?.currency}`);
         return data.result;
       }
       
@@ -241,14 +212,12 @@ export async function calculatePriceWithDrom(car, rates, timeout = 5000) {
     } catch (fetchError) {
       clearTimeout(timeoutId);
       if (fetchError.name === 'AbortError') {
-        console.error(`[Drom API] Timeout for car ${car.infoid} (${timeout}ms)`);
+        return null;
       } else {
         throw fetchError;
       }
-      return null;
     }
   } catch (error) {
-    console.error(`[Drom API] Error calculating price for car ${car.infoid}:`, error.message);
     return null;
   }
 }

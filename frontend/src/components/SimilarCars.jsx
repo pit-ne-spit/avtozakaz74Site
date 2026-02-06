@@ -63,7 +63,6 @@ export default function SimilarCars({ currentCar, exchangeRates }) {
 
         setSimilarCars(similarCarsList);
       } catch (error) {
-        console.error('Error loading similar cars:', error);
         setSimilarCars([]);
       } finally {
         setLoading(false);
